@@ -1,6 +1,11 @@
-// Import stylesheets
+// STYLES
 import './style.css';
 
-// Write TypeScript code!
-const appDiv: HTMLElement = document.getElementById('app');
-appDiv.innerHTML = `<h1>TypeScript Starter</h1>`;
+// DEPENDENCIES
+import 'phaser';
+
+// RUN MAIN
+import { gameConfig } from './src/ZGame';
+
+var game = new Phaser.Game(gameConfig);
+window.focus();
