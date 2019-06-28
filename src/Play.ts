@@ -175,8 +175,8 @@ export class Play extends Phaser.Scene
         this.time.delayedCall(500, this.gameOver, [], this);
     }
 
-    gameOver() {
+    gameOver() 
+    {
         this.scene.restart();
     }
-
 }
