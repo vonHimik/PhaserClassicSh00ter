@@ -12,8 +12,9 @@
           this.load.image("enemy", "enemies/enemyBlack1.png");
       }
 
-      create() {
-        console.log("R.create()");
+      create() 
+      {
+        console.log("Res.create()");
         this.scene.start("Play");
       }
 
