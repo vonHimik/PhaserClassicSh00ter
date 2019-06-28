@@ -1,11 +1,13 @@
   export class Res extends Phaser.Scene 
   {
 
-      constructor(){
+      constructor()
+      {
           super("Res");
       }
 
-      preload() {
+      preload() 
+      {
           console.log("Res.preload()");
           this.load.setBaseURL("https://cdn.jsdelivr.net/gh/kefik/kenney/Shooter/");
           this.load.image("playership1", "playerShip1_blue.png");
