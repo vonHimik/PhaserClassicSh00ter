@@ -1,4 +1,5 @@
-  export class Res extends Phaser.Scene {
+  export class Res extends Phaser.Scene 
+  {
 
       constructor(){
           super("Res");
