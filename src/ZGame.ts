@@ -1,4 +1,4 @@
-import { R } from "./Res";
+import { Res } from "./Res";
 import { Play } from "./Play";
 
 export var gameConfig = {
@@ -12,5 +12,5 @@ export var gameConfig = {
                 gravity: { y: 0 }
             }
         },
-        scene: [Boot, Play],        
+        scene: [Res, Play],        
     };
