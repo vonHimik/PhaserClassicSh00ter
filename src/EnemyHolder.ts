@@ -1,4 +1,5 @@
-export class EnemyHolder {
+export class EnemyHolder 
+{
    ///// {Honza}
    // Enemy variables to customise them and their beavior
 
@@ -10,7 +11,8 @@ export class EnemyHolder {
 
    /////
 
-   constructor( _name: string, _updateFunction:(x: number, y:number)=>void ) {
+   constructor( _name: string, _updateFunction:(x: number, y:number)=>void ) 
+   {
        this.spriteName = _name;
        this.updateFunction = _updateFunction;
    }
