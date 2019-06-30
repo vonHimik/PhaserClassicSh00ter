@@ -1,22 +1,16 @@
-import { Res } from "./Res";
+import { R } from "./Res";
 import { Play } from "./Play";
 
-export var gameConfig = 
-{
+export var gameConfig = {
         type: Phaser.AUTO,
         width: 480,
         height: 640,
         backgroundColor: 0x000000,
-        physics: 
-        {
+        physics: {
             default: 'arcade',
-            arcade: 
-            {
-                gravity: 
-                { 
-                  y: 0 
-                }
+            arcade: {
+                gravity: { y: 0 }
             }
         },
-        scene: [Res, Play],        
-  };
+        scene: [Boot, Play],        
+    };
