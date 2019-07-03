@@ -3,7 +3,7 @@ export class Background extends Phaser.Physics.Arcade.Sprite
   speed:number;
 
   // Конструктор объекта Фон.
-  constructor (scene: Phaser.Scene) 
+  constructor (scene:Phaser.Scene) 
   {
     // Настраиваем место появления (текущая сцена, координаты х и у), текстуру.
     super (scene, 0, 0, "background");
@@ -28,11 +28,13 @@ export class Background extends Phaser.Physics.Arcade.Sprite
     return this;
   }
 
-  // Метод для обновления состояния фо (перемещение, вылет за сцену).
+  // Метод для обновления состояния фона (перемещение, вылет за сцену).
   update (time:number, delta:number) 
   {
+    // Обновляем координаты.
     this.y += this.speed * delta;
     
+    // Если вылетел за сцену, деактивируем.
     if (this.y > Number (this.scene.game.config.height) + 50)
     {
       this.setActive  (false);

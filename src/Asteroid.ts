@@ -28,7 +28,7 @@ export class Asteroid extends Phaser.Physics.Arcade.Sprite
     this.body.height *= 0.3;
     this.body.width *= 0.3;
     this.setPosition (x, y);
-    this.setActive (true);
+    this.setActive  (true);
     this.setVisible (true);
     return this;
   }
@@ -60,7 +60,7 @@ export class Asteroid extends Phaser.Physics.Arcade.Sprite
     return this.x;
   }
 
-  // Метод для установки спрайта астероиду, в зависимости от его размера (большой,       средний, малый).
+  // Метод для установки спрайта астероиду, в зависимости от его размера (большой, средний, малый).
   setSprite():void
   {
     if (this.size == 1)
