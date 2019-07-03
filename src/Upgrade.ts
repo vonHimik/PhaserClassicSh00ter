@@ -27,4 +27,4 @@ export class Upgrade extends Phaser.Physics.Arcade.Sprite
     this.setActive(false);
     this.setVisible(false);
   }
-  }
+}
