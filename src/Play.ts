@@ -622,6 +622,6 @@ collideLaserAsteroid(laser: Bullet, asteroid: Asteroid)
  {
    this.shieldActive = false;
    this.shield.setVisible(false);
-  this.shieldTimer = this.shieldReloadTime;
+   this.shieldTimer = this.shieldReloadTime;
  }
 }
