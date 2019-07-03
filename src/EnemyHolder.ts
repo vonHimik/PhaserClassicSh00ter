@@ -13,6 +13,5 @@ export class EnemyHolder
   {
     this.spriteName = _name;
     this.updateFunction = _updateFunction;
-   }
-
+  }
 }
