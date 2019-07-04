@@ -7,20 +7,26 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite
   // {Honza}
   // Enemy variables to customise them and their beavior
 
-  // Name of the sprite
-  spriteName: string = null;
+  // Имя спрайта.
+  spriteName:string = null;
 
-  // Update function
+  // Функция обновления.
   updateFunction:(x:number, y:number)=>void = null;
 
+  // Конструктор объекта Враг.                         
   constructor (scene:Phaser.Scene) 
   {
+    // Настраиваем место появления (текущая сцена, координаты х и у), текстуру.
     super (scene, 0, 0, "enemy");
+
+    // Настраиваем скорость (пикселей за фрейм).
     this.speed = Phaser.Math.GetSpeed (50, 1);
   }
-  
+
+  // Метод для запуска врага.
   launch (x:number, y:number) : Enemy 
   {
+    // Устанавливаем спрайт.
     if (this.spriteName != null)
     {
       Phaser.Physics.Arcade.Sprite.call(this, this.scene, 0, 0, this.spriteName);
@@ -42,6 +48,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite
     return this;
   }
 
+// Метод для обновления состояния врага - перемещение, выход за экран.
   update (time:number, delta:number) 
   {
     if (this.updateFunction == null)
@@ -62,6 +69,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite
     }
   }
 
+// Метод для иницализации спрайта и функции обновле
   init (holder: EnemyHolder) 
   {
     this.spriteName = holder.spriteName;
