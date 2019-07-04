@@ -3,12 +3,13 @@ export class EnemyHolder
   // {Honza}
   // Enemy variables to customise them and their beavior
 
-  // Name of the sprite
+  // Имя спрайта.
   spriteName:string = null;
 
-  // Update function
+  // Функция обновления.
   updateFunction:(x:number, y:number)=>void = null;
 
+ // Конструктор объекта EnemyHolder.
   constructor (_name:string, _updateFunction:(x:number, y:number)=>void) 
   {
     this.spriteName = _name;

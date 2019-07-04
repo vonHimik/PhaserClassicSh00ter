@@ -69,7 +69,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite
     }
   }
 
-// Метод для иницализации спрайта и функции обновле
+  // Метод для иницализации спрайта и функции обновления.
   init (holder: EnemyHolder) 
   {
     this.spriteName = holder.spriteName;
