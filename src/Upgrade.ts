@@ -25,7 +25,7 @@ export class Upgrade extends Phaser.Physics.Arcade.Sprite
     this.setPosition(x, y - 45);
   }
 
-  // Метод деактивирующий объект Апгрейд при его
+  // Метод  деактивирующий объект Апгрейд при его выходе за границы экрана.
   update (time:number, delta:number) 
   {
     if (this.x > -5 && this.x < 485 && this.y > -5 && this.y < 645) return;
