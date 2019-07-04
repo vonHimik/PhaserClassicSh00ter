@@ -9,7 +9,7 @@ export class EnemyHolder
   // Функция обновления.
   updateFunction:(x:number, y:number)=>void = null;
 
- // Конструктор объекта EnemyHolder.
+  // Конструктор объекта EnemyHolder.
   constructor (_name:string, _updateFunction:(x:number, y:number)=>void) 
   {
     this.spriteName = _name;
