@@ -1,15 +1,20 @@
 export class Res extends Phaser.Scene 
 {
+  // Конструктор объекта Ресурсы.
   constructor()
   {
-    super("Res");
+    super ("Res");
   }
 
+  // Метод для предзагрузки ресурсов (изображений).
   preload() 
   {
     console.log("Res.preload()");
-    
+
+    // Устанавливаем базовую ссылку для загрузки.
     this.load.setBaseURL("https://cdn.jsdelivr.net/gh/kefik/kenney/Shooter/");
+    
+    // Загружаем указанные изображения (по адресу), присваивая им названия.
     this.load.image("playership1", "playerShip1_blue.png");
     this.load.image("bullet", "lasers/laserBlue01.png");
     this.load.image("enemy", "enemies/enemyBlack1.png");
@@ -29,9 +34,11 @@ export class Res extends Phaser.Scene
     this.load.image("asteroidSmall", "meteors/meteorBrown_small1.png");
   }
 
+  // Метод закрывающий текущую сцену и переходящий к главной сцене.
   create() 
   {
     console.log("Res.create()");
-    this.scene.start("Play");
+    
+    this.scene.start ("Play");
   }
 }

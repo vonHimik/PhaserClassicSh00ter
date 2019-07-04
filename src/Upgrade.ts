@@ -1,27 +1,32 @@
 export class Upgrade extends Phaser.Physics.Arcade.Sprite 
 {
-  constructor( scene: Phaser.Scene )
+  // Конструктор объекта Апгрейд.
+  constructor (scene:Phaser.Scene)
   {
-    super(scene, 0, 0, "upgrade");
+    // Размещаем его на сцене.
+    super (scene, 0, 0, "upgrade");
   }
   
+  // Метод для спавна объекта Апгрейд (спрайт, физика, место появления).
   spawn() 
   {
-    Phaser.Physics.Arcade.Sprite.call(this, this.scene, 0, 0, 'powerup');
+    Phaser.Physics.Arcade.Sprite.call (this, this.scene, 0, 0, 'powerup');
     this.scene.physics.add.existing(this);
     this.setPosition(Phaser.Math.Between(20,450), Phaser.Math.Between(20,600));
     this.setActive(true);
     this.setVisible(true);
   }
 
-  defaultBullet(x: number, y:number)
+  // Метод спавнящий снаряд по умолчанию.
+  defaultBullet (x:number, y:number)
   {
     Phaser.Physics.Arcade.Sprite.call(this, this.scene, 0, 0, 'bullet');
     this.scene.physics.add.existing(this);
     this.setPosition(x, y - 45);
   }
 
-  update(time: number, delta: number) 
+  // Метод деактивирующий объект Апгрейд при его
+  update (time:number, delta:number) 
   {
     if (this.x > -5 && this.x < 485 && this.y > -5 && this.y < 645) return;
     this.setActive(false);
