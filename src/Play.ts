@@ -5,13 +5,19 @@ import { Background } from "./Background";
 import { Upgrade } from "./Upgrade";
 import { EnemyHolder } from "./EnemyHolder";
 
+// Класс управляющий процессом игры.
 export class Play extends Phaser.Scene 
 {
+  // Переменная представляю
   player:Phaser.Physics.Arcade.Sprite;
   pickup:Phaser.Physics.Arcade.Sprite;
 
+  // Переменная для масштабирования того, на сколько кусков распадётся корабль игрока.
   pc:number = 8;
+
+  // Куски игрока.
   playerPieces:Phaser.Physics.Arcade.Sprite[];
+
   asteroids:Phaser.Physics.Arcade.Group;
 
   moveKeys:{[key:string]:Phaser.Input.Keyboard.Key};
@@ -19,17 +25,19 @@ export class Play extends Phaser.Scene
   enemies:Phaser.Physics.Arcade.Group;
   background:Phaser.Physics.Arcade.Group;
 
-  // List of predefined enemies
+  // List of predefined enemies.
   enemyHolders:EnemyHolder[];
 
   lastSpawn:number = 0;
   lastPickupSpawn:number = 0;
 
+  // Значения элементов интерфейса (характеристик игрока).
   score:number = 0;
   health:number = 3;
   healthSprites:{[key:number]:Phaser.Physics.Arcade.Sprite};
   healthText:Phaser.GameObjects.Text;
 
+  // Щит.
   shieldActive:boolean = true;
   shieldReloadTime:number = 3;
   shieldTimer:number = 0;
@@ -51,9 +59,11 @@ export class Play extends Phaser.Scene
     super ("Play");
   }
 
+  // Метод инициализирующий игру.
   create() 
   {
     console.log("Play.create()");
+
     this.background = this.physics.add.group
     ({
       classType:Background,
@@ -61,6 +71,7 @@ export class Play extends Phaser.Scene
       runChildUpdate:true
     });
 
+    // Добавляем и настраиваем корабль игрока.
     this.player = this.physics.add.sprite(320, 500, "playership1").setScale(0.5, 0.5);
     this.player.body.collideWorldBounds = true;
     this.player.body.width *= 0.5;
@@ -73,6 +84,7 @@ export class Play extends Phaser.Scene
     this.shield.body.width *= 0.5;
     this.shield.body.height *= 0.5;
     
+    // Добавляем и настраиваем золотые звёзды (усиления).
     this.pickup = this.physics.add.sprite(320, 500, "star").setScale(0.5, 0.5);
     this.pickup.body.collideWorldBounds = true;
     this.pickup.body.width *= 0.5;
@@ -80,20 +92,28 @@ export class Play extends Phaser.Scene
     this.pickup.setActive(false).setVisible(false);
     this.lastPickupSpawn = 0;
     
-    let pw: number = this.player.width / this.pc;
-    let ph: number = this.player.height / this.pc;
+    // Определяем размер кусочков, на которые будет разделяться корабль игрока, на основе его размера и коэффициента масштабирования.
+    let pw:number = this.player.width / this.pc;
+    let ph:number = this.player.height / this.pc;
     this.playerPieces = [];
     
-    for (let i: number = 0; i < this.pc; ++i) 
+    // В цикле проходимся по кораблю игрока, разделяя его на части.
+    for (let i:number = 0; i < this.pc; ++i) 
     {
-      for (let j: number = 0; j < this.pc; ++j) 
+      for (let j:number = 0; j < this.pc; ++j) 
       {
-        let pp : Phaser.Physics.Arcade.Sprite = this.physics.add.sprite(320, 500, "playership1").setScale(0.5, 0.5).setCrop(i*pw, j*ph, pw, ph);
+        // Выполняем обрезку корабля игрока, отделив от него в отдельный спрайт кусочек указанного размера.
+        let pp:Phaser.Physics.Arcade.Sprite = this.physics.add.sprite(320, 500, "playership1").setScale(0.5, 0.5).setCrop(i*pw, j*ph, pw, ph);
+
+        // Этот кусочек невидим.
         pp.setActive(false).setVisible(false);
+
+        // Добавляем кусочек в массив для кусков корабля игрока.
         this.playerPieces.push(pp);
       }
     }
 
+    // Считываем ввод.
     this.moveKeys = <{[key:string]:Phaser.Input.Keyboard.Key}> this.input.keyboard.addKeys
     ({
       'up':Phaser.Input.Keyboard.KeyCodes.W,
@@ -103,7 +123,7 @@ export class Play extends Phaser.Scene
       'fire':Phaser.Input.Keyboard.KeyCodes.SPACE
     });
 
-    // Enables movement of player with WASD keys
+    // Enables movement of player with WASD keys.
     this.input.keyboard.on('keydown_W', function (event:object) 
     {
       this.scene.player.setAccelerationY(-800);
@@ -124,7 +144,7 @@ export class Play extends Phaser.Scene
       this.scene.player.setAccelerationX(800);
     });           
 
-    // Stops player acceleration on uppress of WASD keys
+    // Stops player acceleration on uppress of WASD keys.
     this.input.keyboard.on('keyup_W', function (event:object) 
     {
       if (this.scene.moveKeys['down'].isUp)
@@ -158,7 +178,7 @@ export class Play extends Phaser.Scene
       runChildUpdate: true
     });           
       
-    //Upgrades
+    // Upgrades
     this.upgrades = this.physics.add.group
     ({
       classType: Upgrade,

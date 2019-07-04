@@ -6,14 +6,14 @@ export var gameConfig =
 {
   type: Phaser.AUTO,
 
-  // Разрешение
+  // Разрешение.
   width: 480,
   height: 640,
 
   // Цвет фона.
   backgroundColor: 0x000000,
   
-  // Физика
+  // Физика.
   physics: 
   {
     default: 'arcade',
