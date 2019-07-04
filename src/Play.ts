@@ -8,8 +8,9 @@ import { EnemyHolder } from "./EnemyHolder";
 // Класс управляющий процессом игры.
 export class Play extends Phaser.Scene 
 {
-  // Переменная представляю
+  // Переменная представляющая игрока.
   player:Phaser.Physics.Arcade.Sprite;
+
   pickup:Phaser.Physics.Arcade.Sprite;
 
   // Переменная для масштабирования того, на сколько кусков распадётся корабль игрока.
@@ -109,7 +110,7 @@ export class Play extends Phaser.Scene
         pp.setActive(false).setVisible(false);
 
         // Добавляем кусочек в массив для кусков корабля игрока.
-        this.playerPieces.push(pp);
+        this.playerPieces.push (pp);
       }
     }
 
