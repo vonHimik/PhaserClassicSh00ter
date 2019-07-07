@@ -225,29 +225,37 @@ export class Play extends Phaser.Scene
     // SCORE TEXT
     this.scoreText = this.add.text(5, 5, "Score: 0", { fontFamily: "Arial Black", fontSize: 12, color: "#33ff33", align: 'left' }).setStroke('#333333', 1);
 
-    //Health
+    // Health text
     this.health = 3;
-    this.healthText = this.add.text(5, 20, "Health:", { fontFamily: "Arial Black", fontSize: 12,             color: "#33ff33", align: 'left' }).setStroke('#333333', 1);
+    this.healthText = this.add.text(5, 20, "Health:", { fontFamily: "Arial Black", fontSize: 12, color: "#33ff33", align: 'left' }).setStroke('#333333', 1);
+
+    // Вызываем методы инициализации интерфейса и списка врагов.
     this.initializeHealthUI();
     this.InitializeEnemiesList();
   }
 
+// Метод для инициализации списка врагов.
 InitializeEnemiesList()
 {
+  // Список типов противников
   this.enemyHolders = [
-    new EnemyHolder("blackEnemy", function(time: number, delta: number)
+    // Чёрный
+    new EnemyHolder ("blackEnemy", function (time:number, delta:number)
     {
+      // Поведение
       this.y += this.speed * delta;
-      //console.log(time);
       this.x += 1*this.speed*Math.sin(0.02*this.y)*delta;
 
+      // Обработка выхода за экран.
       if (this.y > Number(this.scene.game.config.height) + 50)
       {
         this.setActive(false);
         this.setVisible(false);
       }
        }),
-    new EnemyHolder("blueEnemy", function(x: number, y: number)
+
+    // Голубой
+    new EnemyHolder("blueEnemy", function(x:number, y:number)
     {
       this.y += this.speed * y;
 
@@ -257,6 +265,8 @@ InitializeEnemiesList()
         this.setVisible(false);
       }
     }),
+
+    // Зелёный
     new EnemyHolder("greenEnemy", function(x: number, delta: number)
     {
       this.y += this.speed * delta;
@@ -269,14 +279,18 @@ InitializeEnemiesList()
       }
     }),
 
+    // Красный
     new EnemyHolder("redEnemy", null)
     ];
 }
 
+// Метод обновляющий состояния игры (спавны, состояния, выбор оружия и т.д.).
 update (time:number, delta:number) 
 {
+  // Отсчитываем время с последнего спавна.
   this.lastSpawn -= delta;
   
+  // Если прошло некоторое время и активных астероидов меньше пяти, то запустим новый.
   if (this.lastSpawn < 0) 
   {
     if (this.asteroids.countActive()<5)
@@ -285,20 +299,26 @@ update (time:number, delta:number)
     }
   }
   
+  // Размещаем щит в нужном месте и следим, чтобы он следовал за игроком.
   this.shield.setPosition(this.player.x, this.player.y);
   this.constrainVelocity(this.player, 100);
   
+  // Оффсеты стрельбы.
   const xGunOffset = 35;
   const yGunOffset = 20;
 
+  // Переключение типа оружия.
   switch(this.gunType) 
   {
     case 0: 
     {
+      // Проверяем нажатие кнопки "огонь".
       if (this.input.keyboard.checkDown(this.moveKeys['fire'], 500))
       {
+        // Настраиваем объект типа боеприпас.
         let b: Bullet = this.lasers.get() as Bullet;
         
+        // Если удачно, то выполняем функцию стрельбы им.
         if (b) 
         {
           b.fire(this.player.x, this.player.y, this.currentBullet);  
@@ -318,6 +338,7 @@ update (time:number, delta:number)
           b.fire(this.player.x + this.lastSideShooted * xGunOffset - xGunOffset/2, this.player.y + yGunOffset, this.currentBullet);
         }
         
+        // Фиксируем что произведён подобный выстрел.
         this.lastSideShooted = (this.lastSideShooted + 1) % 2;
       } 
     break;
@@ -389,12 +410,16 @@ update (time:number, delta:number)
     }
   }
 
+  // Отсчитываем время от последнего спавна апгрейда.
   this.upgradeCooldown -= delta;
 
+  // Если кулдаун прошёл.
   if (this.upgradeCooldown < 0)
   {
+    // Настраиваем объект типа апгрейд.
     let u: Upgrade = this.upgrades.get() as Upgrade;
     
+    // Размещаем апгрейд на сцене и обновляем кулдаун.
     if (u) 
     {
       u.spawn();
@@ -402,6 +427,7 @@ update (time:number, delta:number)
     }
   }
   
+  // Если некоторое время ничего не спавнилось, спавним в разных мес
   if (this.lastSpawn < 0) 
   {
     // SPAWN BACK
