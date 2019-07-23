@@ -312,7 +312,7 @@ update (time:number, delta:number)
   {
     case 0: 
     {
-      // Проверяем нажатие кнопки "огонь".
+      // Проверяем нажатие кнопки "огонь". Число - время до возможности повторного нажатия.
       if (this.input.keyboard.checkDown(this.moveKeys['fire'], 500))
       {
         // Настраиваем объект типа боеприпас.
@@ -329,10 +329,13 @@ update (time:number, delta:number)
     
     case 1: 
     {
+      // Проверяем нажатие кнопки "огонь".
       if (this.input.keyboard.checkDown(this.moveKeys['fire'], 400))
       {
+        // Настраиваем объект типа боеприпас.
         let b: Bullet = this.lasers.get() as Bullet;
         
+        // Если удачно, то выполняем функцию стрельбы им.
         if (b) 
         {
           b.fire(this.player.x + this.lastSideShooted * xGunOffset - xGunOffset/2, this.player.y + yGunOffset, this.currentBullet);
@@ -346,26 +349,33 @@ update (time:number, delta:number)
          
     case 2: 
     {
+      // Проверяем нажатие кнопки "огонь".
       if (this.input.keyboard.checkDown(this.moveKeys['fire'], 300))
       {
+        // Если прошло достаточно времени с момента последнего выстрела.
         if (this.lastSideShooted % 2 == 0) 
         {
+          // Настраиваем объект типа боеприпас.
           let b: Bullet = this.lasers.get() as Bullet;
           
+          // Если удачно, то выполняем функцию стрельбы им.
           if (b) 
           {
             b.fire(this.player.x, this.player.y, this.currentBullet);  
           }
         } 
+        // Если прошло мало времени.
         else 
         {
+          // Настраиваем объект типа боеприпас.
           let b: Bullet = this.lasers.get() as Bullet;
           
+          // Если удачно, то выполняем функцию стрельбы им.
           if (b) 
           {
             b.fire(this.player.x + xGunOffset - xGunOffset/2, this.player.y + yGunOffset, this.currentBullet); 
           }
-          
+          // И повторяем, потому что это двойной выстрел. Место запуска второго снаряда смещаем.
           b = this.lasers.get() as Bullet;
           
           if (b) 
@@ -374,6 +384,7 @@ update (time:number, delta:number)
           }
         }
         
+        // Фиксируем что произведён подобный выстрел.
         this.lastSideShooted = (this.lastSideShooted + 1) % 2;
       } 
     break;
@@ -381,15 +392,19 @@ update (time:number, delta:number)
     
     case 3: 
     {
+      // Проверяем нажатие кнопки "огонь".
       if (this.input.keyboard.checkDown(this.moveKeys['fire'], 250))
       {
+        // Настраиваем объект типа боеприпас.
         let b: Bullet = this.lasers.get() as Bullet;
         
+        // Если удачно, то выполняем функцию стрельбы им.
         if (b) 
         {
           b.fire(this.player.x, this.player.y, this.currentBullet);  
         }
         
+        // И повторяем ещё два раза, потому что это тройной выстрел. Места запуска второго и третьего снарядов смещаем.
         b = this.lasers.get() as Bullet;
         
         if (b) 
@@ -404,6 +419,7 @@ update (time:number, delta:number)
           b.fire(this.player.x - xGunOffset/2, this.player.y + yGunOffset, this.currentBullet)
         }
         
+        // Фиксируем что произведён подобный выстрел.
         this.lastSideShooted = (this.lastSideShooted + 1) % 2;
       } 
     break;
@@ -427,7 +443,7 @@ update (time:number, delta:number)
     }
   }
   
-  // Если некоторое время ничего не спавнилось, спавним в разных мес
+  // Если некоторое время ничего не спавнилось, спавним в разных местах.
   if (this.lastSpawn < 0) 
   {
     // SPAWN BACK
@@ -449,10 +465,13 @@ update (time:number, delta:number)
     //this.lastSpawn += 1;
   }
   
+  // Отсчитываем время от последнего спавна подбираемого предмета.
   this.lastPickupSpawn -= delta;
 
+  // Если на сцене нет подбираемого предмета и он долго не спавнился.
   if (!this.pickup.active && this.lastPickupSpawn < 0) 
   {
+    // То размещаем объект на сцене и обновляем "таймер".
     this.pickup.setActive(true).setVisible(true)
     this.pickup.setVelocity(0,0);
     this.pickup.setAcceleration(0,0);
@@ -464,39 +483,57 @@ update (time:number, delta:number)
     this.lastPickupSpawn += 10000;
   }
 
+  // Если подбираемый объект размещён на сцене, то заставляем его менять размер, со времнем возвращаясь к исходному, создавая эффект "мигания".
   if(this.pickup.active) 
   {
     let scale: number = Math.sin(time*0.005);
     this.pickup.setScale(0.5 + 0.1*scale, 0.5 + 0.1*scale);
   }
 
+  // Если щит не активен.
   if (!this.shieldActive) 
   {
+    // Уменьшаем таймер.
     this.shieldTimer -= delta / 1000;
     
+    // Если таймер меньше нуля.
     if (this.shieldTimer <= 0) 
     {
+      // Активируем щит и делаем его видимым.
       this.shieldActive = true;
       this.shield.setVisible(true);
     }
   }
 
+  // Если противники некоторое время не спавнились.
   if (this.lastSpawn < 0) 
   {
     // SPAWN ENEMY
-    (this.enemies.get() as Enemy).launch(Phaser.Math.Between(50, 400), -50);    
-          
+
+    // Создаём и запускаем группу "Противники".
+    (this.enemies.get() as Enemy).launch(Phaser.Math.Between(50, 400), -50); 
+
+    // Создаём объект типа "враг" и добавляем его в соответствующую группу.
     var enemy : Enemy = this.enemies.get() as Enemy;
+
+    // Генерируем случайный индекс.
     var randomIndex : integer = Phaser.Math.Between(0, this.enemyHolders.length-1);
-          
+
+    // Инициализируем новый объект у управляющей структуры.    
     enemy.init(this.enemyHolders[randomIndex]);
+
+    // Размещаем на сцене.
     enemy.launch(Phaser.Math.Between(50, 400), -50);
+
+    // Сбрасываем таймер спавна.
     this.lastSpawn += 1000;
   }
 }
 
+// Метод для управления (скоростью) спрайта.
 constrainVelocity(sprite: Phaser.Physics.Arcade.Sprite, maxVelocity: number)
 {
+  // Если у объекта (уже) нет спрайта, то выходим.
   if (!sprite || !sprite.body)
   {
     return;
@@ -517,17 +554,22 @@ constrainVelocity(sprite: Phaser.Physics.Arcade.Sprite, maxVelocity: number)
   }
 }
 
+// Метод для добавления и настройки коллайдера подбираемого объекта.
 collidePickup(player: Phaser.Physics.Arcade.Sprite, pickup: Phaser.Physics.Arcade.Sprite) 
 {
+  // Если на сцене сейчас нету игрока или подбираемого объекта, то выходим.
   if (!player.active) return;
   if (!pickup.active) return;
 
+  // При столкновении деактивируем объект.
   pickup.setActive(false).setVisible(false);
   
+  // Если тип оружия не максимальный, то переходим к следующему.
   if (this.gunType < 3) 
   {
     this.gunType += 1;
   }
+  // Если максимальный, то увеличиваем число очков.
   else 
   {
     this.score += 25;
@@ -535,13 +577,17 @@ collidePickup(player: Phaser.Physics.Arcade.Sprite, pickup: Phaser.Physics.Arcad
   }
 }
 
-//MINE
+// Метод для добавления и настройки коллайдера апгрейда.
 collidePlayerPowerup(player: Phaser.Physics.Arcade.Sprite, upgrade: Upgrade)
 {
+  // Если на сцене сейчас нету игрока или апгрейда, то выходим.
   if (!player.active) return;
   if (!upgrade.active) return;
 
+  // При столкновении деактивируем объект.
   upgrade.setActive(false).setVisible(false);
+
+  // Обновляем вооружение.
   this.currentBullet  = (this.currentBullet + 1) % 4;
 
   if(this.currentBullet == BulletType.Fast)
@@ -554,107 +600,151 @@ collidePlayerPowerup(player: Phaser.Physics.Arcade.Sprite, upgrade: Upgrade)
   }
 }
 
-
+// Метод обрабатывающий поражение врага снарядом.
 collideLaserEnemy (laser: Bullet, enemy: Enemy) 
 {
+  // Если на сцене сейчас нету снаряда или врага, то выходим.
   if (!laser.active) return;
   if (!enemy.active) return;
 
+  // При столкновении деактивируем объекты.
   laser.setActive(false).setVisible(false);
   enemy.setActive(false).setVisible(false);
 
+// Добавляем очко и обновляем счётчик.
   this.score += 1;
   this.scoreText.text = "Score: " + this.score;
 }
 
+// Метод обрабатывающий столкновение врага и игрока.
 collidePlayerEnemy(player: Phaser.Physics.Arcade.Sprite, enemy: Enemy) 
 {
+  // Если на сцене сейчас нету игрока или врага, то выходим.
   if (!player.active) return;
   if (!enemy.active) return;
 
+  // При столкновении деактивируем объект-враг.
   enemy.setActive(false).setVisible(false);
-
+  
+  // Если щит активен.
   if (this.shieldActive) 
   {
+    // То вызываем метод наносящий ему урон.
     this.shieldHit();
   } 
+  // Иначе.
   else 
   {
+    // Отнимаем одну жизнь и обновляем интерфейс.
     this.health--;
     this.updateHealthUI();
     
+    // Если число жизней упадёт до нуля.
     if (this.health <= 0) 
     {
+      // То вызываем метод взрывающий корабль игрока.
       this.playerExplode();
     }
   }
 }
 
+// Метод для взрыва корабля игрока.
 playerExplode() 
 {
+  // Уничтожаем коллайдер корабля игрока и деактивируем его как обЪект.
   this.playerEnemyCollier.destroy();
   this.player.setActive(false).setVisible(false);
 
+  // Настраиваем, на сколько кусочков должен разлететься спрайт корабля игрока.
   let pw: number = 0.025 * this.player.width / this.pc;
   let ph: number = 0.025 * this.player.height / this.pc;
   let index: number = 0;
   
+  // Проходимся в цикле по этим кусочкам.
   for (let i: number = 0; i < this.pc; ++i) 
   {
     for (let j: number = 0; j < this.pc; ++j) 
     {
-      let pp : Phaser.Physics.Arcade.Sprite = this.playerPieces[index];          
+      // Каждый будем считать отдельным объектом соответствующего класса со своим индексом.
+      let pp : Phaser.Physics.Arcade.Sprite = this.playerPieces[index];  
+      
+      // Активируем объект.       
       pp.setActive(true).setVisible(true);
+
+      // Настраиваем стартувую позицию.
       pp.setPosition(this.player.x + i*pw, this.player.y + j*ph);
+
+      // Получаем случайную скорость по осям.
       let ix: number = Phaser.Math.FloatBetween(100, 300) - 200;
       let iy: number = Phaser.Math.FloatBetween(100, 300) - 200;           
       pp.setVelocity(ix, iy);
+
+      // Настраваем случайное ускорение.
       pp.setAcceleration(-ix / Phaser.Math.FloatBetween(2, 4), -iy / Phaser.Math.FloatBetween(2, 4));
+      
+      // Увеличиваем индекс.
       index++;
     }
   }
-    
+   // Через несколько секунд вызываем метод конца игры.
    this.time.delayedCall(2500, this.gameOver, [], this);
 }
 
+// Метод обрабатывающий конец игры.
 gameOver() 
 {
+  // Перезагружаем текущую сцену.
   this.scene.restart();
 }
 
+// Метод для инициализации показателя здровья.
 initializeHealthUI() 
 {
+  // Создаём массив для спрайтов, являющихся индикаторами.
   this.healthSprites = [];
   
+  // Проходимся в цикле по числу жизней.
   for (let i: number = 0; i < this.health; i ++) 
   {
+    // На каждую добавляем в выбранное место спрайт.
     this.healthSprites[i] = this.physics.add.sprite(65 + i * 20, 28, "life").setScale(0.5,0.5);
   }
 }
 
+// Метод для обновления показателей здоровья.
 updateHealthUI() 
 {
+  // Удаляем спрайт-индикатор, с индексом текущего числа жизней.
   this.healthSprites[this.health].destroy();
 }
 
+// Метод обрабатывающий столкновение астероида и снаряда.
 collideLaserAsteroid(laser: Bullet, asteroid: Asteroid)
 {
+  // Если на сцене сейчас нету снаряда или астероида, то выходим.
   if (!laser.active) return;
   if (!asteroid.active) return;
 
+  // При столкновении деактивируем объект-снаряд.
   laser.setActive(false).setVisible(false);
 
+  // Добавляем очко и обновляем счёт.
   this.score += 1;
   this.scoreText.text = "Score: " + this.score;
 
+  // Если размер астероида больше 3.
   if (asteroid.size >= 3)
   {
+    // То просто деактивируем этот объект.
     asteroid.setActive(false).setVisible(false);
   }
+  // Иначе.
   else
   {
+    // Повышаем его размер на 1.
     asteroid.size+=1;
-          
+
+    // Создаём ещё один подобный астероид.      
     var t:number = Phaser.Math.Between(-50,50);
     var t2:number = Phaser.Math.Between(-50,50);
     asteroid.setSprite();
@@ -665,8 +755,10 @@ collideLaserAsteroid(laser: Bullet, asteroid: Asteroid)
   }
 }
 
+// Метод обрабатывающий нанесение урона щиту.
  shieldHit() 
  {
+   // Деактивируем щит, делаем его невидимым и перезапускаем таймер.
    this.shieldActive = false;
    this.shield.setVisible(false);
    this.shieldTimer = this.shieldReloadTime;
