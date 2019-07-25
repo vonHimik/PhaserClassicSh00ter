@@ -353,7 +353,7 @@ update (time:number, delta:number)
       }
     break;
     }
-    
+     
     case 1: 
     {
       // Проверяем нажатие кнопки "огонь".

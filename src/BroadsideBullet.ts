@@ -82,7 +82,7 @@ export class BroadsideBullet extends Phaser.Physics.Arcade.Sprite
   broadsideWobblyBullet (x:number, y:number)
   {
     this.speed *= 3;
-    Phaser.Physics.Arcade.Sprite.call (this, this.scene, 0, 0, 's');
+    Phaser.Physics.Arcade.Sprite.call (this, this.scene, 0, 0, 'star');
     this.scene.physics.add.existing (this);
     this.setPosition (x, y - 45);
   }
