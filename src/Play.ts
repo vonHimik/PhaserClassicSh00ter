@@ -1,5 +1,6 @@
 import { Asteroid } from "./Asteroid";
 import { Bullet, BulletType } from "./Bullet";
+import { BroadsideBullet, BroadsideBulletType } from "./BroadsideBullet";
 import { Enemy } from "./Enemy";
 import { Background } from "./Background";
 import { Upgrade } from "./Upgrade";
@@ -9,51 +10,57 @@ import { EnemyHolder } from "./EnemyHolder";
 export class Play extends Phaser.Scene 
 {
   // Переменная представляющая игрока.
-  player:Phaser.Physics.Arcade.Sprite;
+  player : Phaser.Physics.Arcade.Sprite;
 
-  pickup:Phaser.Physics.Arcade.Sprite;
+  // Переменная для подбираемого обЪекта.
+  pickup : Phaser.Physics.Arcade.Sprite;
 
   // Переменная для масштабирования того, на сколько кусков распадётся корабль игрока.
-  pc:number = 8;
+  pc : number = 8;
 
   // Куски игрока.
-  playerPieces:Phaser.Physics.Arcade.Sprite[];
+  playerPieces : Phaser.Physics.Arcade.Sprite[];
 
-  asteroids:Phaser.Physics.Arcade.Group;
+  // Создаём группы с физикой для отдельных типов объектов.
+  asteroids : Phaser.Physics.Arcade.Group;
+  lasers : Phaser.Physics.Arcade.Group;
+  enemies : Phaser.Physics.Arcade.Group;
+  background : Phaser.Physics.Arcade.Group;
 
-  moveKeys:{[key:string]:Phaser.Input.Keyboard.Key};
-  lasers:Phaser.Physics.Arcade.Group;
-  enemies:Phaser.Physics.Arcade.Group;
-  background:Phaser.Physics.Arcade.Group;
+  // Переменная для команд управления.
+  moveKeys : {[key:string]:Phaser.Input.Keyboard.Key};
 
   // List of predefined enemies.
-  enemyHolders:EnemyHolder[];
+  enemyHolders : EnemyHolder[];
 
-  lastSpawn:number = 0;
-  lastPickupSpawn:number = 0;
+  // Переменные для отсчитывания времени с момента последнего спавна (врага, снаряжения).
+  lastSpawn : number = 0;
+  lastPickupSpawn : number = 0;
 
   // Значения элементов интерфейса (характеристик игрока).
-  score:number = 0;
-  health:number = 3;
-  healthSprites:{[key:number]:Phaser.Physics.Arcade.Sprite};
-  healthText:Phaser.GameObjects.Text;
+  score : number = 0;
+  health : number = 3;
+  healthSprites : {[key:number]:Phaser.Physics.Arcade.Sprite};
+  healthText : Phaser.GameObjects.Text;
 
   // Щит.
-  shieldActive:boolean = true;
-  shieldReloadTime:number = 3;
-  shieldTimer:number = 0;
-  shield:Phaser.Physics.Arcade.Sprite;
+  shieldActive : boolean = true;
+  shieldReloadTime : number = 3;
+  shieldTimer : number = 0;
+  shield : Phaser.Physics.Arcade.Sprite;
 
-
-  gunType:number = 0;
-  lastSideShooted:number = 0;
-  upgrades:Phaser.Physics.Arcade.Group;
-  currentBullet:BulletType;
-  shootCooldown:number = 300;
-  upgradeCooldown: number = 0;
+  // Вооружение.
+  gunType : number = 0;
+  lastSideShooted : number = 0;
+  upgrades : Phaser.Physics.Arcade.Group;
+  currentBullet : BulletType;
+  currentBroadsideBullet : BroadsideBulletType;
+  shootCooldown : number = 300;
+  upgradeCooldown : number = 0;
   
-  scoreText:Phaser.GameObjects.Text;
-  playerEnemyCollier:Phaser.Physics.Arcade.Collider;
+  scoreText : Phaser.GameObjects.Text;
+
+  playerEnemyCollier : Phaser.Physics.Arcade.Collider;
 
   constructor() 
   {
@@ -81,6 +88,8 @@ export class Play extends Phaser.Scene
     this.player.depth = 10;
     this.gunType = 0;
     this.currentBullet = BulletType.Default;
+
+    // Добавляем 
     this.shield = this.physics.add.sprite(320, 500, "shield1").setScale(0.5, 0.5);
     this.shield.body.width *= 0.5;
     this.shield.body.height *= 0.5;
