@@ -110,7 +110,7 @@ export class BroadsideBullet extends Phaser.Physics.Arcade.Sprite
     }
 
     // Деактивируем, если улетел за сцену.
-    if (this. < -50)
+    if (this.x < -50)
     {
       this.setActive  (false);
       this.setVisible (false);
