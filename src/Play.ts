@@ -24,6 +24,7 @@ export class Play extends Phaser.Scene
   // Создаём группы с физикой для отдельных типов объектов.
   asteroids : Phaser.Physics.Arcade.Group;
   lasers : Phaser.Physics.Arcade.Group;
+  broadsideLasers : Phaser.Physics.Arcade.Group;
   enemies : Phaser.Physics.Arcade.Group;
   background : Phaser.Physics.Arcade.Group;
 
@@ -89,7 +90,7 @@ export class Play extends Phaser.Scene
     this.gunType = 0;
     this.currentBullet = BulletType.Default;
 
-    // Добавляем 
+    // Добавляем на сцену спрайт щита.
     this.shield = this.physics.add.sprite(320, 500, "shield1").setScale(0.5, 0.5);
     this.shield.body.width *= 0.5;
     this.shield.body.height *= 0.5;
@@ -103,14 +104,14 @@ export class Play extends Phaser.Scene
     this.lastPickupSpawn = 0;
     
     // Определяем размер кусочков, на которые будет разделяться корабль игрока, на основе его размера и коэффициента масштабирования.
-    let pw:number = this.player.width / this.pc;
-    let ph:number = this.player.height / this.pc;
+    let pw : number = this.player.width / this.pc;
+    let ph : number = this.player.height / this.pc;
     this.playerPieces = [];
     
     // В цикле проходимся по кораблю игрока, разделяя его на части.
-    for (let i:number = 0; i < this.pc; ++i) 
+    for (let i : number = 0; i < this.pc; ++i) 
     {
-      for (let j:number = 0; j < this.pc; ++j) 
+      for (let j : number = 0; j < this.pc; ++j) 
       {
         // Выполняем обрезку корабля игрока, отделив от него в отдельный спрайт кусочек указанного размера.
         let pp:Phaser.Physics.Arcade.Sprite = this.physics.add.sprite(320, 500, "playership1").setScale(0.5, 0.5).setCrop(i*pw, j*ph, pw, ph);
@@ -186,7 +187,14 @@ export class Play extends Phaser.Scene
       classType: Bullet,
       maxSize: 20,
       runChildUpdate: true
-    });           
+    });
+
+    this.broadsideLasers = this.physics.add.group
+    ({
+      classType: BroadsideBullet,
+      maxSize: 20,
+      runChildUpdate: true
+    });               
       
     // Upgrades
     this.upgrades = this.physics.add.group
@@ -216,6 +224,8 @@ export class Play extends Phaser.Scene
     // LASERS kill ENEMIES
     this.physics.add.collider(this.lasers, this.enemies, this.collideLaserEnemy, null, this); // last parameter is the context passed into the callback
 
+    this.physics.add.collider(this.broadsideLasers, this.enemies, this.collideBroadsideLaserEnemy, null, this);
+
     // PLAYER is killed by ENEMIES
     this.playerEnemyCollier = this.physics.add.collider(this.player, this.enemies, this.collidePlayerEnemy, null, this); 
     // last parameter is the context passed into the callback
@@ -230,6 +240,8 @@ export class Play extends Phaser.Scene
     this.physics.add.collider(this.player, this.asteroids, this.collidePlayerEnemy, null, this);
 
     this.physics.add.collider(this.lasers, this.asteroids, this.collideLaserAsteroid, null, this);
+
+    this.physics.add.collider(this.broadsideLasers, this.asteroids, this.collideBroadsideLaserAsteroid, null, this);
     
     // SCORE TEXT
     this.scoreText = this.add.text(5, 5, "Score: 0", { fontFamily: "Arial Black", fontSize: 12, color: "#33ff33", align: 'left' }).setStroke('#333333', 1);
@@ -326,11 +338,17 @@ update (time:number, delta:number)
       {
         // Настраиваем объект типа боеприпас.
         let b: Bullet = this.lasers.get() as Bullet;
+        let bb: BroadsideBullet = this.broadsideLasers.get() as BroadsideBullet;
         
         // Если удачно, то выполняем функцию стрельбы им.
         if (b) 
         {
           b.fire(this.player.x, this.player.y, this.currentBullet);  
+        }
+
+        if (bb) 
+        {
+          bb.fire(this.player.x, this.player.y, this.currentBroadsideBullet);  
         }
       }
     break;
@@ -343,11 +361,17 @@ update (time:number, delta:number)
       {
         // Настраиваем объект типа боеприпас.
         let b: Bullet = this.lasers.get() as Bullet;
+        let bb: BroadsideBullet = this.broadsideLasers.get() as BroadsideBullet;
         
         // Если удачно, то выполняем функцию стрельбы им.
         if (b) 
         {
           b.fire(this.player.x + this.lastSideShooted * xGunOffset - xGunOffset/2, this.player.y + yGunOffset, this.currentBullet);
+        }
+
+        if (bb) 
+        {
+          bb.fire(this.player.x + this.lastSideShooted * xGunOffset - xGunOffset/2, this.player.y + yGunOffset, this.currentBroadsideBullet);
         }
         
         // Фиксируем что произведён подобный выстрел.
@@ -366,11 +390,17 @@ update (time:number, delta:number)
         {
           // Настраиваем объект типа боеприпас.
           let b: Bullet = this.lasers.get() as Bullet;
+          let bb: BroadsideBullet = this.broadsideLasers.get() as BroadsideBullet;
           
           // Если удачно, то выполняем функцию стрельбы им.
           if (b) 
           {
             b.fire(this.player.x, this.player.y, this.currentBullet);  
+          }
+
+          if (bb) 
+          {
+            bb.fire(this.player.x, this.player.y, this.currentBroadsideBullet);  
           }
         } 
         // Если прошло мало времени.
@@ -378,18 +408,31 @@ update (time:number, delta:number)
         {
           // Настраиваем объект типа боеприпас.
           let b: Bullet = this.lasers.get() as Bullet;
+          let bb: BroadsideBullet = this.broadsideLasers.get() as BroadsideBullet;
           
           // Если удачно, то выполняем функцию стрельбы им.
           if (b) 
           {
             b.fire(this.player.x + xGunOffset - xGunOffset/2, this.player.y + yGunOffset, this.currentBullet); 
           }
+
+          if (bb) 
+          {
+            bb.fire(this.player.x + xGunOffset - xGunOffset/2, this.player.y + yGunOffset, this.currentBroadsideBullet); 
+          }
+
           // И повторяем, потому что это двойной выстрел. Место запуска второго снаряда смещаем.
           b = this.lasers.get() as Bullet;
+          bb = this.broadsideLasers.get() as BroadsideBullet;
           
           if (b) 
           {
             b.fire(this.player.x - xGunOffset/2, this.player.y + yGunOffset, this.currentBullet); 
+          }
+
+          if (bb) 
+          {
+            bb.fire(this.player.x - xGunOffset/2, this.player.y + yGunOffset, this.currentBroadsideBullet); 
           }
         }
         
@@ -406,26 +449,44 @@ update (time:number, delta:number)
       {
         // Настраиваем объект типа боеприпас.
         let b: Bullet = this.lasers.get() as Bullet;
+        let bb: BroadsideBullet = this.broadsideLasers.get() as BroadsideBullet;
         
         // Если удачно, то выполняем функцию стрельбы им.
         if (b) 
         {
           b.fire(this.player.x, this.player.y, this.currentBullet);  
         }
+
+        if (bb) 
+        {
+          bb.fire(this.player.x, this.player.y, this.currentBroadsideBullet);  
+        }
         
         // И повторяем ещё два раза, потому что это тройной выстрел. Места запуска второго и третьего снарядов смещаем.
         b = this.lasers.get() as Bullet;
+        bb = this.broadsideLasers.get() as BroadsideBullet;
         
         if (b) 
         {
           b.fire(this.player.x + xGunOffset - xGunOffset/2, this.player.y + yGunOffset, this.currentBullet); 
         }
 
+        if (bb) 
+        {
+          bb.fire(this.player.x + xGunOffset - xGunOffset/2, this.player.y + yGunOffset, this.currentBroadsideBullet); 
+        }
+
         b = this.lasers.get() as Bullet;
+        bb = this.broadsideLasers.get() as BroadsideBullet;
         
         if (b) 
         {
           b.fire(this.player.x - xGunOffset/2, this.player.y + yGunOffset, this.currentBullet)
+        }
+
+        if (bb) 
+        {
+          bb.fire(this.player.x - xGunOffset/2, this.player.y + yGunOffset, this.currentBroadsideBullet)
         }
         
         // Фиксируем что произведён подобный выстрел.
@@ -586,10 +647,10 @@ collidePickup(player: Phaser.Physics.Arcade.Sprite, pickup: Phaser.Physics.Arcad
   }
 }
 
-// Метод для добавления и настройки коллайдера апгрейда.
+// Метод для добавления и настройки коллайдера усилителя.
 collidePlayerPowerup(player: Phaser.Physics.Arcade.Sprite, upgrade: Upgrade)
 {
-  // Если на сцене сейчас нету игрока или апгрейда, то выходим.
+  // Если на сцене сейчас нету игрока или усилителя, то выходим.
   if (!player.active) return;
   if (!upgrade.active) return;
 
@@ -598,8 +659,18 @@ collidePlayerPowerup(player: Phaser.Physics.Arcade.Sprite, upgrade: Upgrade)
 
   // Обновляем вооружение.
   this.currentBullet  = (this.currentBullet + 1) % 4;
+  this.currentBroadsideBullet  = (this.currentBroadsideBullet + 1) % 4;
 
-  if(this.currentBullet == BulletType.Fast)
+  if (this.currentBullet == BulletType.Fast)
+  {
+    this.shootCooldown = 100;
+  }
+  else
+  {
+    this.shootCooldown = 300;
+  }
+
+  if (this.currentBroadsideBullet == BroadsideBulletType.Fast)
   {
     this.shootCooldown = 100;
   }
@@ -610,7 +681,7 @@ collidePlayerPowerup(player: Phaser.Physics.Arcade.Sprite, upgrade: Upgrade)
 }
 
 // Метод обрабатывающий поражение врага снарядом.
-collideLaserEnemy (laser: Bullet, enemy: Enemy) 
+collideLaserEnemy (laser : Bullet, enemy : Enemy) 
 {
   // Если на сцене сейчас нету снаряда или врага, то выходим.
   if (!laser.active) return;
@@ -618,6 +689,22 @@ collideLaserEnemy (laser: Bullet, enemy: Enemy)
 
   // При столкновении деактивируем объекты.
   laser.setActive(false).setVisible(false);
+  enemy.setActive(false).setVisible(false);
+
+// Добавляем очко и обновляем счётчик.
+  this.score += 1;
+  this.scoreText.text = "Score: " + this.score;
+}
+
+// Метод обрабатывающий поражение врага снарядом.
+collideBroadsideLaserEnemy (broadsideLaser : BroadsideBullet, enemy : Enemy) 
+{
+  // Если на сцене сейчас нету снаряда или врага, то выходим.
+  if (!broadsideLaser.active) return;
+  if (!enemy.active) return;
+
+  // При столкновении деактивируем объекты.
+  broadsideLaser.setActive(false).setVisible(false);
   enemy.setActive(false).setVisible(false);
 
 // Добавляем очко и обновляем счётчик.
@@ -728,7 +815,7 @@ updateHealthUI()
 }
 
 // Метод обрабатывающий столкновение астероида и снаряда.
-collideLaserAsteroid(laser: Bullet, asteroid: Asteroid)
+collideLaserAsteroid(laser : Bullet, asteroid : Asteroid)
 {
   // Если на сцене сейчас нету снаряда или астероида, то выходим.
   if (!laser.active) return;
@@ -763,6 +850,45 @@ collideLaserAsteroid(laser: Bullet, asteroid: Asteroid)
     asteroid.ydif=Phaser.Math.Between(-50,50);
   }
 }
+
+// Метод обрабатывающий столкновение астероида и снаряда.
+collideBroadsideLaserAsteroid(broadsideLaser : BroadsideBullet, asteroid : Asteroid)
+{
+  // Если на сцене сейчас нету снаряда или астероида, то выходим.
+  if (!broadsideLaser.active) return;
+  if (!asteroid.active) return;
+
+  // При столкновении деактивируем объект-снаряд.
+  broadsideLaser.setActive(false).setVisible(false);
+
+  // Добавляем очко и обновляем счёт.
+  this.score += 1;
+  this.scoreText.text = "Score: " + this.score;
+
+  // Если размер астероида больше 3.
+  if (asteroid.size >= 3)
+  {
+    // То просто деактивируем этот объект.
+    asteroid.setActive(false).setVisible(false);
+  }
+  // Иначе.
+  else
+  {
+    // Повышаем его размер на 1.
+    asteroid.size+=1;
+
+    // Создаём ещё один подобный астероид.      
+    var t:number = Phaser.Math.Between(-50,50);
+    var t2:number = Phaser.Math.Between(-50,50);
+    asteroid.setSprite();
+    (this.asteroids.get() as Asteroid).launch(asteroid.X,asteroid.Y,asteroid.size,t,Phaser.Math.Between(-50,50));
+         
+    asteroid.xdif=-t;
+    asteroid.ydif=Phaser.Math.Between(-50,50);
+  }
+}
+
+
 
 // Метод обрабатывающий нанесение урона щиту.
  shieldHit() 

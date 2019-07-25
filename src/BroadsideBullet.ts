@@ -20,7 +20,7 @@ export class BroadsideBullet extends Phaser.Physics.Arcade.Sprite
   constructor (scene : Phaser.Scene)
   {
     // Настраиваем место появления (текущая сцена, координаты х и у), текстуру.
-    super (scene, 0, 0, "broadsideBullet");
+    super (scene, 0, 0, "star");
     
     // Настраиваем скорость (пикселей за фрейм).
     this.speed = Phaser.Math.GetSpeed (300, 1);
@@ -64,7 +64,7 @@ export class BroadsideBullet extends Phaser.Physics.Arcade.Sprite
   // Вызываем на сцену снаряд базового типа, по координатам, добавляем физику.
   broadsideDefaultBullet (x:number, y:number)
   {
-    Phaser.Physics.Arcade.Sprite.call (this, this.scene, 0, 0, 'bullet');
+    Phaser.Physics.Arcade.Sprite.call (this, this.scene, 0, 0, 'star');
     this.scene.physics.add.existing (this);
     this.setPosition (x, y - 45);
   }
@@ -73,7 +73,7 @@ export class BroadsideBullet extends Phaser.Physics.Arcade.Sprite
   broadsideFastBullet (x:number, y:number)
   {
     this.speed *= 5;
-    Phaser.Physics.Arcade.Sprite.call (this, this.scene, 0, 0, 'fastBullet');
+    Phaser.Physics.Arcade.Sprite.call (this, this.scene, 0, 0, 'star');
     this.scene.physics.add.existing (this);
     this.setPosition (x, y - 45);
   }
@@ -82,7 +82,7 @@ export class BroadsideBullet extends Phaser.Physics.Arcade.Sprite
   broadsideWobblyBullet (x:number, y:number)
   {
     this.speed *= 3;
-    Phaser.Physics.Arcade.Sprite.call (this, this.scene, 0, 0, 'wobblyBullet');
+    Phaser.Physics.Arcade.Sprite.call (this, this.scene, 0, 0, 's');
     this.scene.physics.add.existing (this);
     this.setPosition (x, y - 45);
   }
