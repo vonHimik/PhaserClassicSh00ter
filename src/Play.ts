@@ -89,6 +89,7 @@ export class Play extends Phaser.Scene
     this.player.depth = 10;
     this.gunType = 0;
     this.currentBullet = BulletType.Default;
+    this.currentBroadsideBullet = BroadsideBulletType.Default;
 
     // Добавляем на сцену спрайт щита.
     this.shield = this.physics.add.sprite(320, 500, "shield1").setScale(0.5, 0.5);
