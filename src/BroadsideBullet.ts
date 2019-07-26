@@ -62,7 +62,7 @@ export class BroadsideBullet extends Phaser.Physics.Arcade.Sprite
   }
 
   // Вызываем на сцену снаряд базового типа, по координатам, добавляем физику.
-  broadsideDefaultBullet (x:number, y:number)
+  broadsideDefaultBullet (x : number, y : number)
   {
     Phaser.Physics.Arcade.Sprite.call (this, this.scene, 0, 0, 'broadsideBullet');
     this.scene.physics.add.existing (this);
@@ -70,7 +70,7 @@ export class BroadsideBullet extends Phaser.Physics.Arcade.Sprite
   }
 
   // Вызываем на сцену снаряд быстрого типа, по координатам, модифицируем скорость, добавляем физику.
-  broadsideFastBullet (x:number, y:number)
+  broadsideFastBullet (x : number, y : number)
   {
     this.speed *= 5;
     Phaser.Physics.Arcade.Sprite.call (this, this.scene, 0, 0, 'fastBullet');
@@ -79,7 +79,7 @@ export class BroadsideBullet extends Phaser.Physics.Arcade.Sprite
   }
   
   // Вызываем на сцену снаряд вихляющего типа, по координатам, модифицируем скорость, добавляем физику.
-  broadsideWobblyBullet (x:number, y:number)
+  broadsideWobblyBullet (x : number, y : number) 
   {
     this.speed *= 3;
     Phaser.Physics.Arcade.Sprite.call (this, this.scene, 0, 0, 'wobblyBullet');
@@ -88,7 +88,7 @@ export class BroadsideBullet extends Phaser.Physics.Arcade.Sprite
   }
 
   // Метод для обновления снаряда - перермещение.
-  update (time:number, delta:number)
+  update (time : number, delta : number)
   {
     // По x.
     this.x -= this.speed * delta;
@@ -98,8 +98,7 @@ export class BroadsideBullet extends Phaser.Physics.Arcade.Sprite
     if (this.broadsideBulletType == BroadsideBulletType.Default)
     {
       // Меняем размеры.
-      this.scaleX = 0.3; 
-      this.scaleY = 0.3;
+      this.rotation = -1.55; 
     }
     
     // Если тип снаряда - вихляющий.

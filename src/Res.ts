@@ -17,7 +17,7 @@ export class Res extends Phaser.Scene
     // Загружаем указанные изображения (по адресу), присваивая им названия.
     this.load.image("playership1", "playerShip1_blue.png");
     this.load.image("bullet", "lasers/laserBlue01.png");
-    this.load.image("broadsideBullet", "lasers/laserGreen15.png");
+    this.load.image("broadsideBullet", "lasers/laserBlue07.png");
     this.load.image("enemy", "enemies/enemyBlack1.png");
     this.load.image("star", "powerups/star_gold.png");
     this.load.image("life", "ui/playerLife1_blue.png");
