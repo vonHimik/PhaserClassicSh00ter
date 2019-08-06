@@ -1,7 +1,7 @@
 import { Asteroid } from "./Asteroid";
 import { Bullet, BulletType } from "./Bullet";
 import { LeftsideBullet, LeftsideBulletType } from "./LeftsideBullet";
-import { RightsideBullet, RightsideBulletType } from "./RsideBullet";
+import { RightsideBullet, RightsideBulletType } from "./RghtsideBullet";
 import { Enemy } from "./Enemy";
 import { Background } from "./Background";
 import { Upgrade } from "./Upgrade";
