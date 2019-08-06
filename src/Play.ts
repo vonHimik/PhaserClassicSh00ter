@@ -1,6 +1,7 @@
 import { Asteroid } from "./Asteroid";
 import { Bullet, BulletType } from "./Bullet";
 import { LeftsideBullet, LeftsideBulletType } from "./LeftsideBullet";
+import { RightsideBullet, RightsideBulletType } from "./RsideBullet";
 import { Enemy } from "./Enemy";
 import { Background } from "./Background";
 import { Upgrade } from "./Upgrade";
@@ -853,7 +854,7 @@ collideLaserAsteroid(laser : Bullet, asteroid : Asteroid)
 }
 
 // Метод обрабатывающий столкновение астероида и снаряда.
-collideBroadsideLaserAsteroid(broadsideLaser : LsideBullet, asteroid : Asteroid)
+collideBroadsideLaserAsteroid(broadsideLaser : LeftsideBullet, asteroid : Asteroid)
 {
   // Если на сцене сейчас нету снаряда или астероида, то выходим.
   if (!broadsideLaser.active) return;
