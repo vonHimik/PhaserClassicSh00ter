@@ -2,6 +2,7 @@ import { Asteroid } from "./Asteroid";
 import { Bullet, BulletType } from "./Bullet";
 import { LeftsideBullet, LeftsideBulletType } from "./LeftsideBullet";
 import { RightsideBullet, RightsideBulletType } from "./RightsideBullet";
+import { BacksideBullet, BacksideBulletType } from "./BacksideBullet";
 import { Enemy } from "./Enemy";
 import { Background } from "./Background";
 import { Upgrade } from "./Upgrade";
@@ -27,6 +28,7 @@ export class Play extends Phaser.Scene
   lasers : Phaser.Physics.Arcade.Group;
   leftsideLasers : Phaser.Physics.Arcade.Group;
   rightsideLasers : Phaser.Physics.Arcade.Group;
+  bsideLasers : Phaser.Physics.Arcade.Group;
   enemies : Phaser.Physics.Arcade.Group;
   background : Phaser.Physics.Arcade.Group;
 
