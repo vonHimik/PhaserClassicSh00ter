@@ -1,5 +1,5 @@
 // Список типов боеприпасов.
-export enum BroadsideBulletType 
+export enum LeftsideBulletType 
 {
    Default,
    Wobbly, // Вихляющие
@@ -7,10 +7,10 @@ export enum BroadsideBulletType
    Fast,
 }
 
-export class BroadsideBullet extends Phaser.Physics.Arcade.Sprite 
+export class LeftsideBullet extends Phaser.Physics.Arcade.Sprite 
 {
   speed : number;
-  broadsideBulletType : BroadsideBulletType;
+  leftsideBulletType : LeftsideBulletType;
   totalTime : number = 0;
 
   // Число снарядов за залп.
@@ -27,32 +27,32 @@ export class BroadsideBullet extends Phaser.Physics.Arcade.Sprite
   }
 
   // Метод для выстрела, устанаваливаем характеристики снаряда.
-  fire (x:number, y:number, broadsideBulletType : BroadsideBulletType) 
+  fire (x:number, y:number, leftsideBulletType : LeftsideBulletType) 
   {
     this.totalTime = Phaser.Math.FloatBetween (0,7);
     this.shotMultiply = Phaser.Math.FloatBetween (0.5,1);
     this.speed = Phaser.Math.GetSpeed (300, 1);
     this.scaleX = 1;
     this.scaleY = 1;
-    this.broadsideBulletType = broadsideBulletType;     
+    this.leftsideBulletType = leftsideBulletType;     
     
     // Переключаем тип снаряда.
-    switch (broadsideBulletType)
+    switch (leftsideBulletType)
     {
-      case BroadsideBulletType.Default:
-      this.broadsideDefaultBullet (x,y);
+      case LeftsideBulletType.Default:
+      this.leftsideDefaultBullet (x,y);
       break;
 
-      case BroadsideBulletType.Fast:
-      this.broadsideFastBullet (x,y);
+      case LeftsideBulletType.Fast:
+      this.leftsideFastBullet (x,y);
       break;
 
-      case BroadsideBulletType.Wobbly:
-      this.broadsideWobblyBullet (x,y);
+      case LeftsideBulletType.Wobbly:
+      this.leftsideWobblyBullet (x,y);
       break;
 
-      case BroadsideBulletType.Mega:
-      this.broadsideDefaultBullet (x,y);
+      case LeftsideBulletType.Mega:
+      this.leftsideDefaultBullet (x,y);
       this.speed *= 3;
       break;
     }
@@ -62,7 +62,7 @@ export class BroadsideBullet extends Phaser.Physics.Arcade.Sprite
   }
 
   // Вызываем на сцену снаряд базового типа, по координатам, добавляем физику.
-  broadsideDefaultBullet (x : number, y : number)
+  leftsideDefaultBullet (x : number, y : number)
   {
     Phaser.Physics.Arcade.Sprite.call (this, this.scene, 0, 0, 'broadsideBullet');
     this.scene.physics.add.existing (this);
@@ -70,7 +70,7 @@ export class BroadsideBullet extends Phaser.Physics.Arcade.Sprite
   }
 
   // Вызываем на сцену снаряд быстрого типа, по координатам, модифицируем скорость, добавляем физику.
-  broadsideFastBullet (x : number, y : number)
+  leftsideFastBullet (x : number, y : number)
   {
     this.speed *= 5;
     Phaser.Physics.Arcade.Sprite.call (this, this.scene, 0, 0, 'fastBullet');
@@ -79,7 +79,7 @@ export class BroadsideBullet extends Phaser.Physics.Arcade.Sprite
   }
   
   // Вызываем на сцену снаряд вихляющего типа, по координатам, модифицируем скорость, добавляем физику.
-  broadsideWobblyBullet (x : number, y : number) 
+  leftsideWobblyBullet (x : number, y : number) 
   {
     this.speed *= 3;
     Phaser.Physics.Arcade.Sprite.call (this, this.scene, 0, 0, 'wobblyBullet');
@@ -94,22 +94,25 @@ export class BroadsideBullet extends Phaser.Physics.Arcade.Sprite
     this.x -= this.speed * delta;
     this.totalTime += delta;
 
-    // Если тип снаряда - мега.
-    if (this.broadsideBulletType == BroadsideBulletType.Default)
+    // Если тип снаряда - обычный.
+    if (this.leftsideBulletType == LeftsideBulletType.Default)
     {
-      // Меняем размеры.
+      // Поворачиваем.
       this.rotation = -1.55; 
     }
     
     // Если тип снаряда - вихляющий.
-    if (this.broadsideBulletType == BroadsideBulletType.Wobbly)
+    if (this.leftsideBulletType == LeftsideBulletType.Wobbly)
     {
+      // Поворачиваем.
+      this.rotation = -1.55; 
+
       // По y.
       this.y += this.shotMultiply * 20 * Math.sin (this.totalTime/30);
     }
     
     // Если тип снаряда - мега.
-    if (this.broadsideBulletType == BroadsideBulletType.Mega)
+    if (this.leftsideBulletType == LeftsideBulletType.Mega)
     {
       // Меняем размеры.
       this.scaleX = 3 * Math.sin (this.totalTime/100);
