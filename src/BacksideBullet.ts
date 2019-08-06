@@ -93,10 +93,20 @@ export class BacksideBullet extends Phaser.Physics.Arcade.Sprite
     // По у.
     this.y += this.speed * delta;
     this.totalTime += delta;
+
+    // Если тип снаряда - обычный.
+    if (this.backsideBulletType == BacksideBulletType.Default)
+    {
+      // Поворачиваем.
+      this.rotation = -3.15; 
+    }
     
     // Если тип снаряда - вихляющий.
     if (this.backsideBulletType == BacksideBulletType.Wobbly)
     {
+      // Поворачиваем.
+      this.rotation = -3.15; 
+
       // По х.
       this.x += this.shotMultiply * 20 * Math.sin (this.totalTime/30);
     }
@@ -110,7 +120,7 @@ export class BacksideBullet extends Phaser.Physics.Arcade.Sprite
     }
 
     // Деактивируем, если улетел за сцену.
-    if (this.y > 50)
+    if (this.y > 2000)
     {
       this.setActive  (false);
       this.setVisible (false);

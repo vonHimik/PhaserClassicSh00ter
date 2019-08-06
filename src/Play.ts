@@ -28,7 +28,7 @@ export class Play extends Phaser.Scene
   lasers : Phaser.Physics.Arcade.Group;
   leftsideLasers : Phaser.Physics.Arcade.Group;
   rightsideLasers : Phaser.Physics.Arcade.Group;
-  bsideLasers : Phaser.Physics.Arcade.Group;
+  backsideLasers : Phaser.Physics.Arcade.Group;
   enemies : Phaser.Physics.Arcade.Group;
   background : Phaser.Physics.Arcade.Group;
 
@@ -55,12 +55,13 @@ export class Play extends Phaser.Scene
   shield : Phaser.Physics.Arcade.Sprite;
 
   // Вооружение.
-  gunType : number = 0;
+  gunType : number = 0; 
   lastSideShooted : number = 0;
   upgrades : Phaser.Physics.Arcade.Group;
   currentBullet : BulletType;
   currentLeftsideBullet : LeftsideBulletType;
   currentRightsideBullet : RightsideBulletType;
+  currentBacksideBullet : BacksideBulletType;
   shootCooldown : number = 300;
   upgradeCooldown : number = 0;
   
@@ -96,6 +97,7 @@ export class Play extends Phaser.Scene
     this.currentBullet = BulletType.Default;
     this.currentLeftsideBullet = LeftsideBulletType.Default;
     this.currentRightsideBullet = RightsideBulletType.Default;
+    this.currentBacksideBullet = BacksideBulletType.Default;
 
     // Добавляем на сцену спрайт щита.
     this.shield = this.physics.add.sprite(320, 500, "shield1").setScale(0.5, 0.5);
@@ -208,6 +210,13 @@ export class Play extends Phaser.Scene
       classType: RightsideBullet,
       maxSize: 20,
       runChildUpdate: true
+    }); 
+
+    this.backsideLasers = this.physics.add.group
+    ({
+      classType: BacksideBullet,
+      maxSize: 20,
+      runChildUpdate: true
     });                
       
     // Upgrades
@@ -242,6 +251,8 @@ export class Play extends Phaser.Scene
 
     this.physics.add.collider(this.rightsideLasers, this.enemies, this.collideRightsideLaserEnemy, null, this);
 
+    this.physics.add.collider(this.backsideLasers, this.enemies, this.collideBacksideLaserEnemy, null, this);
+
     // PLAYER is killed by ENEMIES
     this.playerEnemyCollier = this.physics.add.collider(this.player, this.enemies, this.collidePlayerEnemy, null, this); 
     // last parameter is the context passed into the callback
@@ -260,6 +271,8 @@ export class Play extends Phaser.Scene
     this.physics.add.collider(this.leftsideLasers, this.asteroids, this.collideLeftsideLaserAsteroid, null, this);
 
     this.physics.add.collider(this.rightsideLasers, this.asteroids, this.collideRightsideLaserAsteroid, null, this);
+
+    this.physics.add.collider(this.backsideLasers, this.asteroids, this.collideBacksideLaserAsteroid, null, this);
     
     // SCORE TEXT
     this.scoreText = this.add.text(5, 5, "Score: 0", { fontFamily: "Arial Black", fontSize: 12, color: "#33ff33", align: 'left' }).setStroke('#333333', 1);
@@ -346,7 +359,7 @@ update (time:number, delta:number)
   const xGunOffset = 35;
   const yGunOffset = 20;
 
-  // Переключение типа оружия.
+  // Переключение мощности оружия.
   switch(this.gunType) 
   {
     case 0: 
@@ -356,66 +369,22 @@ update (time:number, delta:number)
       {
         // Настраиваем объект типа боеприпас.
         let b: Bullet = this.lasers.get() as Bullet;
-        let lb: LeftsideBullet = this.leftsideLasers.get() as LeftsideBullet;
-        let rb: RightsideBullet = this.rightsideLasers.get() as RightsideBullet;
         
         // Если удачно, то выполняем функцию стрельбы им.
         if (b) 
         {
           b.fire(this.player.x, this.player.y, this.currentBullet);  
         }
-
-        if (lb) 
-        {
-          lb.fire(this.player.x, this.player.y, this.currentLeftsideBullet);  
-        }
-
-        if (rb) 
-        {
-          rb.fire(this.player.x, this.player.y, this.currentRightsideBullet);  
-        }
       }
     break;
     }
-     
-    case 1: 
-    {
-      // Проверяем нажатие кнопки "огонь".
-      if (this.input.keyboard.checkDown(this.moveKeys['fire'], 400))
-      {
-        // Настраиваем объект типа боеприпас.
-        let b: Bullet = this.lasers.get() as Bullet;
-        let lb: LeftsideBullet = this.leftsideLasers.get() as LeftsideBullet;
-        let rb: RightsideBullet = this.rightsideLasers.get() as RightsideBullet;
-        
-        // Если удачно, то выполняем функцию стрельбы им.
-        if (b) 
-        {
-          b.fire(this.player.x + this.lastSideShooted * xGunOffset - xGunOffset/2, this.player.y + yGunOffset, this.currentBullet);
-        }
-
-        if (lb) 
-        {
-          lb.fire(this.player.x + this.lastSideShooted * xGunOffset - xGunOffset/2, this.player.y + yGunOffset, this.currentLeftsideBullet);
-        }
-
-        if (rb) 
-        {
-          rb.fire(this.player.x, this.player.y, this.currentRightsideBullet);  
-        }
-        
-        // Фиксируем что произведён подобный выстрел.
-        this.lastSideShooted = (this.lastSideShooted + 1) % 2;
-      } 
-    break;
-    }
          
-    case 2: 
+    case 1: 
     {
       // Проверяем нажатие кнопки "огонь".
       if (this.input.keyboard.checkDown(this.moveKeys['fire'], 300))
       {
-        // Если прошло достаточно времени с момента последнего выстрела.
+        // Этот тип выстрела двухфазовый. Фаза 1 - по одному выстрелу вперёд и по сторонам.
         if (this.lastSideShooted % 2 == 0) 
         {
           // Настраиваем объект типа боеприпас.
@@ -439,13 +408,11 @@ update (time:number, delta:number)
             rb.fire(this.player.x, this.player.y, this.currentRightsideBullet);  
           }
         } 
-        // Если прошло мало времени.
+        // Фаза 2 - два выстрела вперёд.
         else 
         {
           // Настраиваем объект типа боеприпас.
           let b: Bullet = this.lasers.get() as Bullet;
-          let lb: LeftsideBullet = this.leftsideLasers.get() as LeftsideBullet;
-          let rb: RightsideBullet = this.rightsideLasers.get() as RightsideBullet;
           
           // Если удачно, то выполняем функцию стрельбы им.
           if (b) 
@@ -453,34 +420,12 @@ update (time:number, delta:number)
             b.fire(this.player.x + xGunOffset - xGunOffset/2, this.player.y + yGunOffset, this.currentBullet); 
           }
 
-          if (lb) 
-          {
-            lb.fire(this.player.x + xGunOffset - xGunOffset/2, this.player.y + yGunOffset, this.currentLeftsideBullet); 
-          }
-
-          if (rb) 
-          {
-            rb.fire(this.player.x + xGunOffset - xGunOffset/2, this.player.y + yGunOffset, this.currentRightsideBullet); 
-          }
-
           // И повторяем, потому что это двойной выстрел. Место запуска второго снаряда смещаем.
           b = this.lasers.get() as Bullet;
-          lb = this.leftsideLasers.get() as LeftsideBullet;
-          rb = this.leftsideLasers.get() as RightsideBullet;
           
           if (b) 
           {
             b.fire(this.player.x - xGunOffset/2, this.player.y + yGunOffset, this.currentBullet); 
-          }
-
-          if (lb) 
-          {
-            lb.fire(this.player.x - xGunOffset/2, this.player.y + yGunOffset, this.currentLeftsideBullet); 
-          }
-
-          if (rb) 
-          {
-            rb.fire(this.player.x - xGunOffset/2, this.player.y + yGunOffset, this.currentRightsideBullet); 
           }
         }
         
@@ -490,7 +435,7 @@ update (time:number, delta:number)
     break;
     }
     
-    case 3: 
+    case 2: 
     {
       // Проверяем нажатие кнопки "огонь".
       if (this.input.keyboard.checkDown(this.moveKeys['fire'], 250))
@@ -499,6 +444,7 @@ update (time:number, delta:number)
         let b: Bullet = this.lasers.get() as Bullet;
         let lb: LeftsideBullet = this.leftsideLasers.get() as LeftsideBullet;
         let rb: RightsideBullet = this.rightsideLasers.get() as RightsideBullet;
+        let bb: BacksideBullet = this.backsideLasers.get() as BacksideBullet;
         
         // Если удачно, то выполняем функцию стрельбы им.
         if (b) 
@@ -515,46 +461,27 @@ update (time:number, delta:number)
         {
           rb.fire(this.player.x, this.player.y, this.currentRightsideBullet);  
         }
+
+        if (bb) 
+        {
+          bb.fire(this.player.x, this.player.y, this.currentBacksideBullet);  
+        }
         
         // И повторяем ещё два раза, потому что это тройной выстрел. Места запуска второго и третьего снарядов смещаем.
         b = this.lasers.get() as Bullet;
-        lb = this.leftsideLasers.get() as LeftsideBullet;
-        rb = this.leftsideLasers.get() as RightsideBullet;
         
         if (b) 
         {
           b.fire(this.player.x + xGunOffset - xGunOffset/2, this.player.y + yGunOffset, this.currentBullet); 
         }
 
-        if (lb) 
-        {
-          lb.fire(this.player.x + xGunOffset - xGunOffset/2, this.player.y + yGunOffset, this.currentLeftsideBullet); 
-        }
-
-        if (rb) 
-        {
-          rb.fire(this.player.x + xGunOffset - xGunOffset/2, this.player.y + yGunOffset, this.currentRightsideBullet); 
-        }
-
         b = this.lasers.get() as Bullet;
-        lb = this.leftsideLasers.get() as LeftsideBullet;
-        rb = this.leftsideLasers.get() as RightsideBullet;
         
         if (b) 
         {
           b.fire(this.player.x - xGunOffset/2, this.player.y + yGunOffset, this.currentBullet)
         }
 
-        if (lb) 
-        {
-          lb.fire(this.player.x - xGunOffset/2, this.player.y + yGunOffset, this.currentLeftsideBullet)
-        }
-
-        if (rb) 
-        {
-          rb.fire(this.player.x - xGunOffset/2, this.player.y + yGunOffset, this.currentRightsideBullet)
-        }
-        
         // Фиксируем что произведён подобный выстрел.
         this.lastSideShooted = (this.lastSideShooted + 1) % 2;
       } 
@@ -690,7 +617,7 @@ constrainVelocity(sprite: Phaser.Physics.Arcade.Sprite, maxVelocity: number)
   }
 }
 
-// Метод для добавления и настройки коллайдера подбираемого объекта.
+// Метод для добавления и настройки коллайдера подбираемого объекта (усилителя, звёздочка).
 collidePickup(player: Phaser.Physics.Arcade.Sprite, pickup: Phaser.Physics.Arcade.Sprite) 
 {
   // Если на сцене сейчас нету игрока или подбираемого объекта, то выходим.
@@ -700,8 +627,8 @@ collidePickup(player: Phaser.Physics.Arcade.Sprite, pickup: Phaser.Physics.Arcad
   // При столкновении деактивируем объект.
   pickup.setActive(false).setVisible(false);
   
-  // Если тип оружия не максимальный, то переходим к следующему.
-  if (this.gunType < 3) 
+  // Если мощность оружия не максимальная, то переходим к следующему.
+  if (this.gunType < 2) 
   {
     this.gunType += 1;
   }
@@ -713,7 +640,7 @@ collidePickup(player: Phaser.Physics.Arcade.Sprite, pickup: Phaser.Physics.Arcad
   }
 }
 
-// Метод для добавления и настройки коллайдера усилителя.
+// Метод для добавления и настройки коллайдера переключателя оружия (молния).
 collidePlayerPowerup(player: Phaser.Physics.Arcade.Sprite, upgrade: Upgrade)
 {
   // Если на сцене сейчас нету игрока или усилителя, то выходим.
@@ -723,10 +650,11 @@ collidePlayerPowerup(player: Phaser.Physics.Arcade.Sprite, upgrade: Upgrade)
   // При столкновении деактивируем объект.
   upgrade.setActive(false).setVisible(false);
 
-  // Обновляем вооружение.
+  // Переключаем вооружение.
   this.currentBullet  = (this.currentBullet + 1) % 4;
   this.currentLeftsideBullet  = (this.currentLeftsideBullet + 1) % 4;
   this.currentRightsideBullet  = (this.currentRightsideBullet + 1) % 4;
+  this.currentBacksideBullet  = (this.currentBacksideBullet + 1) % 4;
 
   if (this.currentBullet == BulletType.Fast)
   {
@@ -747,6 +675,15 @@ collidePlayerPowerup(player: Phaser.Physics.Arcade.Sprite, upgrade: Upgrade)
   }
 
   if (this.currentRightsideBullet == RightsideBulletType.Fast)
+  {
+    this.shootCooldown = 100;
+  }
+  else
+  {
+    this.shootCooldown = 300;
+  }
+
+  if (this.currentBacksideBullet == BacksideBulletType.Fast)
   {
     this.shootCooldown = 100;
   }
@@ -797,6 +734,22 @@ collideRightsideLaserEnemy (rightsideLaser : RightsideBullet, enemy : Enemy)
 
   // При столкновении деактивируем объекты.
   rightsideLaser.setActive(false).setVisible(false);
+  enemy.setActive(false).setVisible(false);
+
+// Добавляем очко и обновляем счётчик.
+  this.score += 1;
+  this.scoreText.text = "Score: " + this.score;
+}
+
+// Метод обрабатывающий поражение врага кормовым снарядом.
+collideBacksideLaserEnemy (backsideLaser : BacksideBullet, enemy : Enemy) 
+{
+  // Если на сцене сейчас нету снаряда или врага, то выходим.
+  if (!backsideLaser.active) return;
+  if (!enemy.active) return;
+
+  // При столкновении деактивируем объекты.
+  backsideLaser.setActive(false).setVisible(false);
   enemy.setActive(false).setVisible(false);
 
 // Добавляем очко и обновляем счётчик.
@@ -989,6 +942,43 @@ collideRightsideLaserAsteroid(rightsideLaser : RightsideBullet, asteroid : Aster
 
   // При столкновении деактивируем объект-снаряд.
   rightsideLaser.setActive(false).setVisible(false);
+
+  // Добавляем очко и обновляем счёт.
+  this.score += 1;
+  this.scoreText.text = "Score: " + this.score;
+
+  // Если размер астероида больше 3.
+  if (asteroid.size >= 3)
+  {
+    // То просто деактивируем этот объект.
+    asteroid.setActive(false).setVisible(false);
+  }
+  // Иначе.
+  else
+  {
+    // Повышаем его размер на 1.
+    asteroid.size+=1;
+
+    // Создаём ещё один подобный астероид.      
+    var t:number = Phaser.Math.Between(-50,50);
+    var t2:number = Phaser.Math.Between(-50,50);
+    asteroid.setSprite();
+    (this.asteroids.get() as Asteroid).launch(asteroid.X,asteroid.Y,asteroid.size,t,Phaser.Math.Between(-50,50));
+         
+    asteroid.xdif=-t;
+    asteroid.ydif=Phaser.Math.Between(-50,50);
+  }
+}
+
+// Метод обрабатывающий столкновение астероида и левого бокового снаряда.
+collideBacksideLaserAsteroid(backsideLaser : BacksideBullet, asteroid : Asteroid)
+{
+  // Если на сцене сейчас нету снаряда или астероида, то выходим.
+  if (!backsideLaser.active) return;
+  if (!asteroid.active) return;
+
+  // При столкновении деактивируем объект-снаряд.
+  backsideLaser.setActive(false).setVisible(false);
 
   // Добавляем очко и обновляем счёт.
   this.score += 1;
