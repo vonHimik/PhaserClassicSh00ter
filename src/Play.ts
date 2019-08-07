@@ -17,6 +17,9 @@ export class Play extends Phaser.Scene
   // Переменная для подбираемого обЪекта.
   pickup : Phaser.Physics.Arcade.Sprite;
 
+  // Переменная для дополнительной жизни.
+  heal : Phaser.Physics.Arcade.Sprite;
+
   // Переменная для масштабирования того, на сколько кусков распадётся корабль игрока.
   pc : number = 8;
 
@@ -41,6 +44,7 @@ export class Play extends Phaser.Scene
   // Переменные для отсчитывания времени с момента последнего спавна (врага, снаряжения).
   lastSpawn : number = 0;
   lastPickupSpawn : number = 0;
+  lastHealSpawn : number = 0;
 
   // Значения элементов интерфейса (характеристик игрока).
   score : number = 0;
@@ -104,6 +108,14 @@ export class Play extends Phaser.Scene
     this.shield.body.width *= 0.5;
     this.shield.body.height *= 0.5;
     
+    // Добавляем и настраиваем дополнительные жизни.
+    this.heal = this.physics.add.sprite(320, 500, "life").setScale(0.5, 0.5);
+    this.heal.body.collideWorldBounds = true;
+    this.heal.body.width *= 0.5;
+    this.heal.body.height *= 0.5;
+    this.heal.setActive(false).setVisible(false);
+    this.lastHealSpawn = 0;
+
     // Добавляем и настраиваем золотые звёзды (усиления).
     this.pickup = this.physics.add.sprite(320, 500, "star").setScale(0.5, 0.5);
     this.pickup.body.collideWorldBounds = true;
@@ -258,6 +270,9 @@ export class Play extends Phaser.Scene
     // last parameter is the context passed into the callback
 
     this.physics.add.collider(this.player, this.pickup, this.collidePickup, null, this); 
+    // last parameter is the context passed into the callback
+
+    this.physics.add.collider(this.player, this.heal, this.collideHeal, null, this); 
     // last parameter is the context passed into the callback
 
     // PLAYER is killed by UPGRADE
@@ -553,6 +568,31 @@ update (time:number, delta:number)
     this.pickup.setScale(0.5 + 0.1*scale, 0.5 + 0.1*scale);
   }
 
+  // Отсчитываем время от последнего спавна дополнительной жизни.
+  this.lastHealSpawn -= delta;
+
+  // Если на сцене нет подбираемого предмета и он долго не спавнился.
+  if (!this.heal.active && this.lastHealSpawn < 0) 
+  {
+    // То размещаем объект на сцене и обновляем "таймер".
+    this.heal.setActive(true).setVisible(true)
+    this.heal.setVelocity(0,0);
+    this.heal.setAcceleration(0,0);
+          
+    let x: number = Phaser.Math.Between(50, 400);
+    let y: number = Phaser.Math.Between(25, 200);
+
+    this.heal.setPosition(x, y)
+    this.lastHealSpawn += 10000;
+  }
+
+  // Если дополнительная жизнь размещена на сцене, то заставляем её менять размер, со времнем возвращаясь к исходному, создавая эффект "мигания".
+  if(this.heal.active) 
+  {
+    let scale: number = Math.sin(time*0.005);
+    this.heal.setScale(0.6 + 0.05*scale, 0.6 + 0.05*scale);
+  }
+
   // Если щит не активен.
   if (!this.shieldActive) 
   {
@@ -631,6 +671,30 @@ collidePickup(player: Phaser.Physics.Arcade.Sprite, pickup: Phaser.Physics.Arcad
   if (this.gunType < 2) 
   {
     this.gunType += 1;
+  }
+  // Если максимальный, то увеличиваем число очков.
+  else 
+  {
+    this.score += 25;
+    this.scoreText.text = "Score: " + this.score;
+  }
+}
+
+// Метод для добавления и настройки коллайдера дополнительной жизни.
+collideHeal(player: Phaser.Physics.Arcade.Sprite, heal: Phaser.Physics.Arcade.Sprite)
+{
+  // Если на сцене сейчас нету игрока или подбираемого объекта, то выходим.
+  if (!player.active) return;
+  if (!heal.active) return;
+
+  // При столкновении деактивируем объект.
+  heal.setActive(false).setVisible(false);
+  
+  // Если мощность оружия не максимальная, то переходим к следующему.
+  if (this.health < 3) 
+  {
+    this.health++;
+    this.increaseHealth();
   }
   // Если максимальный, то увеличиваем число очков.
   else 
@@ -852,11 +916,31 @@ initializeHealthUI()
   }
 }
 
-// Метод для обновления показателей здоровья.
+// Метод для обновления показателей здоровья (уменьшение).
 updateHealthUI() 
 {
   // Удаляем спрайт-индикатор, с индексом текущего числа жизней.
   this.healthSprites[this.health].destroy();
+}
+
+// Метод для обновления показателей здоровья (увеличение).
+increaseHealth()
+{
+  // Создаём массив для спрайтов, являющихся индикаторами.
+  /this.healthSprites = [];
+
+  for (let i: number = 0; i < this.health; i ++) 
+  {
+    // На каждую добавляем в выбранное место спрайт.
+    this.healthSprites[i].destroy();
+  }
+  
+  // Проходимся в цикле по числу жизней.
+  for (let i: number = 0; i < this.health; i ++) 
+  {
+    // На каждую добавляем в выбранное место спрайт.
+    this.healthSprites[i] = this.physics.add.sprite(65 + i * 20, 28, "life").setScale(0.5,0.5);
+  }
 }
 
 // Метод обрабатывающий столкновение астероида и снаряда.
@@ -933,7 +1017,7 @@ collideLeftsideLaserAsteroid(leftsideLaser : LeftsideBullet, asteroid : Asteroid
   }
 }
 
-// Метод обрабатывающий столкновение астероида и левого бокового снаряда.
+// Метод обрабатывающий столкновение астероида и правого бокового снаряда.
 collideRightsideLaserAsteroid(rightsideLaser : RightsideBullet, asteroid : Asteroid)
 {
   // Если на сцене сейчас нету снаряда или астероида, то выходим.
@@ -970,7 +1054,7 @@ collideRightsideLaserAsteroid(rightsideLaser : RightsideBullet, asteroid : Aster
   }
 }
 
-// Метод обрабатывающий столкновение астероида и левого бокового снаряда.
+// Метод обрабатывающий столкновение астероида и кормового снаряда.
 collideBacksideLaserAsteroid(backsideLaser : BacksideBullet, asteroid : Asteroid)
 {
   // Если на сцене сейчас нету снаряда или астероида, то выходим.
