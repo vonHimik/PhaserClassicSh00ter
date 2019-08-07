@@ -988,7 +988,6 @@ decreaseHealth()
 increaseHealth()
 {
   // Создаём массив для спрайтов, являющихся индикаторами.
-  //this.healthSprites = [];
 
   for (let i: number = 0; i < this.health; i ++) 
   {
