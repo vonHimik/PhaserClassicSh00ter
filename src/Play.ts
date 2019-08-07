@@ -20,6 +20,9 @@ export class Play extends Phaser.Scene
   // Переменная для дополнительной жизни.
   heal : Phaser.Physics.Arcade.Sprite;
 
+  // Переменная для восстановителя энергии щита.
+  shieldBooster : Phaser.Physics.Arcade.Sprite;
+
   // Переменная для масштабирования того, на сколько кусков распадётся корабль игрока.
   pc : number = 8;
 
@@ -45,18 +48,22 @@ export class Play extends Phaser.Scene
   lastSpawn : number = 0;
   lastPickupSpawn : number = 0;
   lastHealSpawn : number = 0;
+  lastShieldBoosterSpawn : number = 0;
 
-  // Значения элементов интерфейса (характеристик игрока).
+  // Значения элементов интерфейса - очки.
   score : number = 0;
+  scoreText : Phaser.GameObjects.Text;
+
+ // Значения элементов интерфейса - здоровье.
   health : number = 3;
   healthSprites : {[key:number]:Phaser.Physics.Arcade.Sprite};
   healthText : Phaser.GameObjects.Text;
 
-  // Щит.
+  // Значения элементов интерфейса - щит.
   shieldActive : boolean = true;
-  shieldReloadTime : number = 3;
-  shieldTimer : number = 0;
   shield : Phaser.Physics.Arcade.Sprite;
+  shieldText : Phaser.GameObjects.Text;
+  shieldEnergy : number = 100;
 
   // Вооружение.
   gunType : number = 0; 
@@ -68,8 +75,6 @@ export class Play extends Phaser.Scene
   currentBacksideBullet : BacksideBulletType;
   shootCooldown : number = 300;
   upgradeCooldown : number = 0;
-  
-  scoreText : Phaser.GameObjects.Text;
 
   playerEnemyCollier : Phaser.Physics.Arcade.Collider;
 
@@ -115,6 +120,14 @@ export class Play extends Phaser.Scene
     this.heal.body.height *= 0.5;
     this.heal.setActive(false).setVisible(false);
     this.lastHealSpawn = 0;
+
+    // Добавляем и настраиваем восстановитель щита.
+    this.shieldBooster = this.physics.add.sprite(320, 500, "booster").setScale(0.5, 0.5);
+    this.shieldBooster.body.collideWorldBounds = true;
+    this.shieldBooster.body.width *= 0.5;
+    this.shieldBooster.body.height *= 0.5;
+    this.shieldBooster.setActive(false).setVisible(false);
+    this.lastShieldBoosterSpawn = 0;
 
     // Добавляем и настраиваем золотые звёзды (усиления).
     this.pickup = this.physics.add.sprite(320, 500, "star").setScale(0.5, 0.5);
@@ -275,6 +288,9 @@ export class Play extends Phaser.Scene
     this.physics.add.collider(this.player, this.heal, this.collideHeal, null, this); 
     // last parameter is the context passed into the callback
 
+    this.physics.add.collider(this.player, this.shieldBooster, this.collideShieldBooster, null, this); 
+    // last parameter is the context passed into the callback
+
     // PLAYER is killed by UPGRADE
     this.physics.add.collider(this.player, this.upgrades, this.collidePlayerPowerup, null, this); 
     // last parameter is the context passed into the callback
@@ -295,6 +311,9 @@ export class Play extends Phaser.Scene
     // Health text
     this.health = 3;
     this.healthText = this.add.text(5, 20, "Health:", { fontFamily: "Arial Black", fontSize: 12, color: "#33ff33", align: 'left' }).setStroke('#333333', 1);
+
+    // Shield text
+    this.shieldText = this.add.text(5, 35, "Shield energy: " + this.shieldEnergy + "%", { fontFamily: "Arial Black", fontSize: 12, color: "#33ff33", align: 'left' }).setStroke('#333333', 1);
 
     // Вызываем методы инициализации интерфейса и списка врагов.
     this.initializeHealthUI();
@@ -571,7 +590,7 @@ update (time:number, delta:number)
   // Отсчитываем время от последнего спавна дополнительной жизни.
   this.lastHealSpawn -= delta;
 
-  // Если на сцене нет подбираемого предмета и он долго не спавнился.
+  // Если на сцене нет дополнительной жизни и она долго не спавнился.
   if (!this.heal.active && this.lastHealSpawn < 0) 
   {
     // То размещаем объект на сцене и обновляем "таймер".
@@ -593,19 +612,36 @@ update (time:number, delta:number)
     this.heal.setScale(0.6 + 0.05*scale, 0.6 + 0.05*scale);
   }
 
-  // Если щит не активен.
-  if (!this.shieldActive) 
+  // Отсчитываем время от последнего спавна восстановителя щита.
+  this.lastShieldBoosterSpawn -= delta;
+
+  // Если на сцене нет восстановителя щита и он долго не спавнился.
+  if (!this.shieldBooster.active && this.lastShieldBoosterSpawn < 0) 
   {
-    // Уменьшаем таймер.
-    this.shieldTimer -= delta / 1000;
-    
-    // Если таймер меньше нуля.
-    if (this.shieldTimer <= 0) 
-    {
-      // Активируем щит и делаем его видимым.
-      this.shieldActive = true;
-      this.shield.setVisible(true);
-    }
+    // То размещаем объект на сцене и обновляем "таймер".
+    this.shieldBooster.setActive(true).setVisible(true)
+    this.shieldBooster.setVelocity(0,0);
+    this.shieldBooster.setAcceleration(0,0);
+          
+    let x: number = Phaser.Math.Between(50, 400);
+    let y: number = Phaser.Math.Between(25, 200);
+
+    this.shieldBooster.setPosition(x, y)
+    this.lastShieldBoosterSpawn += 10000;
+  }
+
+  // Если щит не активен.
+  if (this.shieldEnergy < 1)
+  {
+    this.shieldActive = false;
+    this.shield.setVisible(false);
+  }
+  
+  // Восстановление щита после отключения.
+  if (!this.shieldActive && this.shieldEnergy >= 1) 
+  {
+    this.shieldActive = true;
+    this.shield.setVisible(true);
   }
 
   // Если противники некоторое время не спавнились.
@@ -690,13 +726,38 @@ collideHeal(player: Phaser.Physics.Arcade.Sprite, heal: Phaser.Physics.Arcade.Sp
   // При столкновении деактивируем объект.
   heal.setActive(false).setVisible(false);
   
-  // Если мощность оружия не максимальная, то переходим к следующему.
+  // Если число жизней меньше максимального числа.
   if (this.health < 3) 
   {
+    // То добавляем игроку жизнь.
     this.health++;
     this.increaseHealth();
   }
-  // Если максимальный, то увеличиваем число очков.
+  // Если же больше, то увеличиваем число очков.
+  else 
+  {
+    this.score += 25;
+    this.scoreText.text = "Score: " + this.score;
+  }
+}
+
+// Метод для добавления и настройки коллайдера восстановителя щита.
+collideShieldBooster(player : Phaser.Physics.Arcade.Sprite, shieldBooster : Phaser.Physics.Arcade.Sprite)
+{
+  // Если на сцене сейчас нету игрока или подбираемого объекта, то выходим.
+  if (!player.active) return;
+  if (!shieldBooster.active) return;
+
+  // При столкновении деактивируем объект.
+  shieldBooster.setActive(false).setVisible(false);
+  
+  // Если мощность щита меньше максимальной.
+  if (this.shieldEnergy < 100) 
+  {
+    // То восстанавливаем её.
+    this.shieldUp();
+  }
+  // Если максимальна, то добавляем очков.
   else 
   {
     this.score += 25;
@@ -842,7 +903,7 @@ collidePlayerEnemy(player: Phaser.Physics.Arcade.Sprite, enemy: Enemy)
   {
     // Отнимаем одну жизнь и обновляем интерфейс.
     this.health--;
-    this.updateHealthUI();
+    this.decreaseHealth();
     
     // Если число жизней упадёт до нуля.
     if (this.health <= 0) 
@@ -917,7 +978,7 @@ initializeHealthUI()
 }
 
 // Метод для обновления показателей здоровья (уменьшение).
-updateHealthUI() 
+decreaseHealth() 
 {
   // Удаляем спрайт-индикатор, с индексом текущего числа жизней.
   this.healthSprites[this.health].destroy();
@@ -927,7 +988,7 @@ updateHealthUI()
 increaseHealth()
 {
   // Создаём массив для спрайтов, являющихся индикаторами.
-  /this.healthSprites = [];
+  //this.healthSprites = [];
 
   for (let i: number = 0; i < this.health; i ++) 
   {
@@ -1094,9 +1155,20 @@ collideBacksideLaserAsteroid(backsideLaser : BacksideBullet, asteroid : Asteroid
 // Метод обрабатывающий нанесение урона щиту. 
  shieldHit() 
  {
-   // Деактивируем щит, делаем его невидимым и перезапускаем таймер.
-   this.shieldActive = false;
-   this.shield.setVisible(false);
-   this.shieldTimer = this.shieldReloadTime;
+   // Если у щита есть энергия.
+   if (this.shieldEnergy > 10)
+   {
+      // Наносим урон энергии щита.
+      this.shieldEnergy -= 10;
+      this.shieldText.text = "Shield energy: " + this.shieldEnergy + "%";
+   }
+ }
+
+ // Метод обрабатывающий восстановления энергии щита. 
+ shieldUp() 
+ {
+   // Восстанавливаем энергию щита.
+   this.shieldEnergy += 10;
+   this.shieldText.text = "Shield energy: " + this.shieldEnergy + "%";
  }
 }
