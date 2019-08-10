@@ -7,13 +7,10 @@ import { Enemy } from "./Enemy";
 import { Background } from "./Background";
 import { Upgrade } from "./Upgrade";
 import { EnemyHolder } from "./EnemyHolder";
-import { Timer } from "./Timer";
 
 // Класс управляющий процессом игры.
 export class Play extends Phaser.Scene 
 {
-  timer : Timer;
-  
   // Переменная представляющая игрока.
   player : Phaser.Physics.Arcade.Sprite;
 
@@ -852,6 +849,7 @@ collideLaserEnemy (laser : Bullet, enemy : Enemy)
   this.score += 1;
   this.scoreText.text = "Score: " + this.score;
   this.addExplosionEffect(enemy.x, enemy.y);
+
   //this.deleteExplosionEffect(this.explosionEffect);
 }
 
