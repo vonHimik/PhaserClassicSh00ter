@@ -34,6 +34,7 @@ export class Res extends Phaser.Scene
     this.load.image("asteroidMed", "meteors/meteorBrown_med1.png");
     this.load.image("asteroidSmall", "meteors/meteorBrown_small1.png");
     this.load.image("booster", "parts/turretBase_small.png");
+    this.load.image("effect", "effects/star2.png");
   }
 
   // Метод закрывающий текущую сцену и переходящий к главной сцене.

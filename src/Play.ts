@@ -7,10 +7,13 @@ import { Enemy } from "./Enemy";
 import { Background } from "./Background";
 import { Upgrade } from "./Upgrade";
 import { EnemyHolder } from "./EnemyHolder";
+import { Timer } from "./Timer";
 
 // Класс управляющий процессом игры.
 export class Play extends Phaser.Scene 
 {
+  timer : Timer;
+  
   // Переменная представляющая игрока.
   player : Phaser.Physics.Arcade.Sprite;
 
@@ -22,6 +25,9 @@ export class Play extends Phaser.Scene
 
   // Переменная для восстановителя энергии щита.
   shieldBooster : Phaser.Physics.Arcade.Sprite;
+
+  // Переменнаая для эффекта взрыва.
+  explosionEffect : Phaser.Physics.Arcade.Sprite;
 
   // Переменная для масштабирования того, на сколько кусков распадётся корабль игрока.
   pc : number = 8;
@@ -670,7 +676,7 @@ update (time:number, delta:number)
 }
 
 // Метод для управления (скоростью) спрайта.
-constrainVelocity(sprite: Phaser.Physics.Arcade.Sprite, maxVelocity: number)
+constrainVelocity(sprite : Phaser.Physics.Arcade.Sprite, maxVelocity : number)
 {
   // Если у объекта (уже) нет спрайта, то выходим.
   if (!sprite || !sprite.body)
@@ -691,6 +697,19 @@ constrainVelocity(sprite: Phaser.Physics.Arcade.Sprite, maxVelocity: number)
     sprite.body.velocity.x = vx;
     sprite.body.velocity.y = vy;
   }
+}
+
+addExplosionEffect ( x : number, y : number )
+{
+    this.explosionEffect = this.physics.add.sprite(x, y, "effect").setScale(0.5, 0.5);
+    this.explosionEffect.body.width *= 0.5;
+    this.explosionEffect.body.height *= 0.5;
+}
+
+deleteExplosionEffect ( effect : Phaser.Physics.Arcade.Sprite )
+{
+  if (!effect.active) return;
+  effect.setActive(false).setVisible(false);
 }
 
 // Метод для добавления и настройки коллайдера подбираемого объекта (усилителя, звёздочка).
@@ -832,6 +851,8 @@ collideLaserEnemy (laser : Bullet, enemy : Enemy)
 // Добавляем очко и обновляем счётчик.
   this.score += 1;
   this.scoreText.text = "Score: " + this.score;
+  this.addExplosionEffect(enemy.x, enemy.y);
+  //this.deleteExplosionEffect(this.explosionEffect);
 }
 
 // Метод обрабатывающий поражение врага боковым левым снарядом.
