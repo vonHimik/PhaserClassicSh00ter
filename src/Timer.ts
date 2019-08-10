@@ -1,4 +1,4 @@
-class Timer 
+exportclass Timer 
 {
     constructor (public counter = 3) 
     {
