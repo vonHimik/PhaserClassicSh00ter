@@ -696,6 +696,7 @@ constrainVelocity(sprite : Phaser.Physics.Arcade.Sprite, maxVelocity : number)
   }
 }
 
+// Метод вызывающий по указанным координатам спрайт звёздочки для имитации взрыва.
 addExplosionEffect ( x : number, y : number )
 {
     this.explosionEffect = this.physics.add.sprite(x, y, "effect").setScale(0.5, 0.5);
@@ -703,6 +704,7 @@ addExplosionEffect ( x : number, y : number )
     this.explosionEffect.body.height *= 0.5;
 }
 
+// Метод удаляющий спрайт звёздочки.
 deleteExplosionEffect ( effect : Phaser.Physics.Arcade.Sprite )
 {
   if (!effect.active) return;
@@ -834,6 +836,12 @@ collidePlayerPowerup(player: Phaser.Physics.Arcade.Sprite, upgrade: Upgrade)
   }
 }
 
+// Метод для ручной деактивации объекта-противника.
+deactivateEnemy(enemy : Enemy)
+{
+  enemy.setActive(false).setVisible(false);
+}
+
 // Метод обрабатывающий поражение врага снарядом.
 collideLaserEnemy (laser : Bullet, enemy : Enemy) 
 {
@@ -841,16 +849,21 @@ collideLaserEnemy (laser : Bullet, enemy : Enemy)
   if (!laser.active) return;
   if (!enemy.active) return;
 
-  // При столкновении деактивируем объекты.
-  laser.setActive(false).setVisible(false);
-  enemy.setActive(false).setVisible(false);
-
-// Добавляем очко и обновляем счётчик.
-  this.score += 1;
-  this.scoreText.text = "Score: " + this.score;
+  // При попадании поверх спрайта противника накладываем спрайт эффекта взрыва.
   this.addExplosionEffect(enemy.x, enemy.y);
 
-  //this.deleteExplosionEffect(this.explosionEffect);
+  // Отложенно деактивируем объект-проотивника.
+  this.time.delayedCall(80, this.deactivateEnemy, [enemy], this);
+  
+  // Отложенно деактивируем эффект взрыва.
+  this.time.delayedCall(100, this.deleteExplosionEffect, [this.explosionEffect], this);
+
+  // При столкновении деактивируем объекты.
+  laser.setActive(false).setVisible(false);
+
+  // Добавляем очко и обновляем счётчик.
+  this.score += 1;
+  this.scoreText.text = "Score: " + this.score;
 }
 
 // Метод обрабатывающий поражение врага боковым левым снарядом.
@@ -860,9 +873,17 @@ collideLeftsideLaserEnemy (leftsideLaser : LeftsideBullet, enemy : Enemy)
   if (!leftsideLaser.active) return;
   if (!enemy.active) return;
 
+  // При попадании поверх спрайта противника накладываем спрайт эффекта взрыва.
+  this.addExplosionEffect(enemy.x, enemy.y);
+
+  // Отложенно деактивируем объект-проотивника.
+  this.time.delayedCall(80, this.deactivateEnemy, [enemy], this);
+  
+  // Отложенно деактивируем эффект взрыва.
+  this.time.delayedCall(100, this.deleteExplosionEffect, [this.explosionEffect], this);
+
   // При столкновении деактивируем объекты.
   leftsideLaser.setActive(false).setVisible(false);
-  enemy.setActive(false).setVisible(false);
 
 // Добавляем очко и обновляем счётчик.
   this.score += 1;
@@ -876,9 +897,17 @@ collideRightsideLaserEnemy (rightsideLaser : RightsideBullet, enemy : Enemy)
   if (!rightsideLaser.active) return;
   if (!enemy.active) return;
 
+  // При попадании поверх спрайта противника накладываем спрайт эффекта взрыва.
+  this.addExplosionEffect(enemy.x, enemy.y);
+
+  // Отложенно деактивируем объект-проотивника.
+  this.time.delayedCall(80, this.deactivateEnemy, [enemy], this);
+  
+  // Отложенно деактивируем эффект взрыва.
+  this.time.delayedCall(100, this.deleteExplosionEffect, [this.explosionEffect], this);
+
   // При столкновении деактивируем объекты.
   rightsideLaser.setActive(false).setVisible(false);
-  enemy.setActive(false).setVisible(false);
 
 // Добавляем очко и обновляем счётчик.
   this.score += 1;
@@ -892,9 +921,17 @@ collideBacksideLaserEnemy (backsideLaser : BacksideBullet, enemy : Enemy)
   if (!backsideLaser.active) return;
   if (!enemy.active) return;
 
+  // При попадании поверх спрайта противника накладываем спрайт эффекта взрыва.
+  this.addExplosionEffect(enemy.x, enemy.y);
+
+  // Отложенно деактивируем объект-проотивника.
+  this.time.delayedCall(80, this.deactivateEnemy, [enemy], this);
+  
+  // Отложенно деактивируем эффект взрыва.
+  this.time.delayedCall(100, this.deleteExplosionEffect, [this.explosionEffect], this);
+
   // При столкновении деактивируем объекты.
   backsideLaser.setActive(false).setVisible(false);
-  enemy.setActive(false).setVisible(false);
 
 // Добавляем очко и обновляем счётчик.
   this.score += 1;
