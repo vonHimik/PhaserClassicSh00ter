@@ -115,12 +115,12 @@ export class LeftsideBullet extends Phaser.Physics.Arcade.Sprite
     if (this.leftsideBulletType == LeftsideBulletType.Mega)
     {
       // Меняем размеры.
-      this.scaleX = 3 * Math.sin (this.totalTime/100);
-      this.scaleY = 3 * Math.sin (this.totalTime/100);
+      this.scaleX = 2 * Math.sin (this.totalTime/100);
+      this.scaleY = 2 * Math.sin (this.totalTime/100);
     }
 
     // Деактивируем, если улетел за сцену.
-    if (this.x < -1000 || this.x > 1000)
+    if (this.x <= 0)
     {
       this.setActive  (false);
       this.setVisible (false);

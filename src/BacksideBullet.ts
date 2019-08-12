@@ -115,12 +115,12 @@ export class BacksideBullet extends Phaser.Physics.Arcade.Sprite
     if (this.backsideBulletType == BacksideBulletType.Mega)
     {
       // Меняем размеры.
-      this.scaleX = 3 * Math.sin (this.totalTime/100);
-      this.scaleY = 3 * Math.sin (this.totalTime/100);
+      this.scaleX = 2 * Math.sin (this.totalTime/100);
+      this.scaleY = 2 * Math.sin (this.totalTime/100);
     }
 
     // Деактивируем, если улетел за сцену.
-    if (this.y > 2000)
+    if (this.y >= 00)
     {
       this.setActive  (false);
       this.setVisible (false);

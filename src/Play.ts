@@ -68,6 +68,10 @@ export class Play extends Phaser.Scene
   shieldText : Phaser.GameObjects.Text;
   shieldEnergy : number = 100;
 
+  // Переменная в которую будем считать число пропущенных врагов.
+  missedEnemies : number = 0;
+  missedEnemiesText : Phaser.GameObjects.Text;
+
   // Вооружение.
   gunType : number = 0; 
   lastSideShooted : number = 0;
@@ -174,22 +178,22 @@ export class Play extends Phaser.Scene
     // Enables movement of player with WASD keys.
     this.input.keyboard.on('keydown_W', function (event:object) 
     {
-      this.scene.player.setAccelerationY(-800);
+      this.scene.player.setAccelerationY(-1000);
     });
     
     this.input.keyboard.on('keydown_S', function (event:object) 
     {
-      this.scene.player.setAccelerationY(800);
+      this.scene.player.setAccelerationY(1000);
     });
 
     this.input.keyboard.on('keydown_A', function (event:object) 
     {
-      this.scene.player.setAccelerationX(-800);
+      this.scene.player.setAccelerationX(-1000);
     });
     
     this.input.keyboard.on('keydown_D', function (event:object) 
     {
-      this.scene.player.setAccelerationX(800);
+      this.scene.player.setAccelerationX(1000);
     });           
 
     // Stops player acceleration on uppress of WASD keys.
@@ -283,20 +287,14 @@ export class Play extends Phaser.Scene
 
     // PLAYER is killed by ENEMIES
     this.playerEnemyCollier = this.physics.add.collider(this.player, this.enemies, this.collidePlayerEnemy, null, this); 
-    // last parameter is the context passed into the callback
 
     this.physics.add.collider(this.player, this.pickup, this.collidePickup, null, this); 
-    // last parameter is the context passed into the callback
 
     this.physics.add.collider(this.player, this.heal, this.collideHeal, null, this); 
-    // last parameter is the context passed into the callback
 
     this.physics.add.collider(this.player, this.shieldBooster, this.collideShieldBooster, null, this); 
-    // last parameter is the context passed into the callback
 
-    // PLAYER is killed by UPGRADE
     this.physics.add.collider(this.player, this.upgrades, this.collidePlayerPowerup, null, this); 
-    // last parameter is the context passed into the callback
 
     this.physics.add.collider(this.player, this.asteroids, this.collidePlayerEnemy, null, this);
 
@@ -318,6 +316,9 @@ export class Play extends Phaser.Scene
     // Shield text
     this.shieldText = this.add.text(5, 35, "Shield energy: " + this.shieldEnergy + "%", { fontFamily: "Arial Black", fontSize: 12, color: "#33ff33", align: 'left' }).setStroke('#333333', 1);
 
+    // Missed enemies text
+    this.missedEnemiesText = this.add.text(5, 50, "Missed enemies: " + this.missedEnemies, { fontFamily: "Arial Black", fontSize: 12, color: "#33ff33", align: 'left' }).setStroke('#333333', 1);
+
     // Вызываем методы инициализации интерфейса и списка врагов.
     this.initializeHealthUI();
     this.InitializeEnemiesList();
@@ -338,6 +339,14 @@ InitializeEnemiesList()
       // Обработка выхода за экран.
       if (this.y > Number(this.scene.game.config.height) + 50)
       {
+        this.scene.missedEnemies++;
+        this.scene.missedEnemiesText.text = "Missed enemies: " + this.scene.missedEnemies;
+
+        if (this.scene.missedEnemies >= 50)
+        {
+          this.scene.gameOver();
+        }
+
         this.setActive(false);
         this.setVisible(false);
       }
@@ -350,6 +359,14 @@ InitializeEnemiesList()
 
       if (this.y > Number(this.scene.game.config.height) + 50)
       {
+        this.scene.missedEnemiesText.text = "Missed enemies: " + this.scene.missedEnemies;
+        this.scene.missedEnemies++;
+
+        if (this.scene.missedEnemies >= 50)
+        {
+          this.scene.gameOver();
+        }
+
         this.setActive(false);
         this.setVisible(false);
       }
@@ -363,13 +380,18 @@ InitializeEnemiesList()
 
       if (this.y > Number(this.scene.game.config.height) + 50)
       {
+        this.scene.missedEnemiesText.text = "Missed enemies: " + this.scene.missedEnemies;
+        this.scene.missedEnemies++;
+
+        if (this.scene.missedEnemies >= 50)
+        {
+          this.scene.gameOver();
+        }
+
         this.setActive(false);
         this.setVisible(false);
       }
     }),
-
-    // Красный
-    new EnemyHolder("redEnemy", null)
     ];
 }
 
@@ -572,14 +594,14 @@ update (time:number, delta:number)
   if (!this.pickup.active && this.lastPickupSpawn < 0) 
   {
     // То размещаем объект на сцене и обновляем "таймер".
-    this.pickup.setActive(true).setVisible(true)
+    this.pickup.setActive(true).setVisible(true);
     this.pickup.setVelocity(0,0);
     this.pickup.setAcceleration(0,0);
           
     let x: number = Phaser.Math.Between(50, 400);
     let y: number = Phaser.Math.Between(25, 200);
 
-    this.pickup.setPosition(x, y)
+    this.pickup.setPosition(x, y);
     this.lastPickupSpawn += 10000;
   }
 
@@ -597,14 +619,14 @@ update (time:number, delta:number)
   if (!this.heal.active && this.lastHealSpawn < 0) 
   {
     // То размещаем объект на сцене и обновляем "таймер".
-    this.heal.setActive(true).setVisible(true)
+    this.heal.setActive(true).setVisible(true);
     this.heal.setVelocity(0,0);
     this.heal.setAcceleration(0,0);
           
     let x: number = Phaser.Math.Between(50, 400);
     let y: number = Phaser.Math.Between(25, 200);
 
-    this.heal.setPosition(x, y)
+    this.heal.setPosition(x, y);
     this.lastHealSpawn += 10000;
   }
 
@@ -622,14 +644,14 @@ update (time:number, delta:number)
   if (!this.shieldBooster.active && this.lastShieldBoosterSpawn < 0) 
   {
     // То размещаем объект на сцене и обновляем "таймер".
-    this.shieldBooster.setActive(true).setVisible(true)
+    this.shieldBooster.setActive(true).setVisible(true);
     this.shieldBooster.setVelocity(0,0);
     this.shieldBooster.setAcceleration(0,0);
           
     let x: number = Phaser.Math.Between(50, 400);
     let y: number = Phaser.Math.Between(25, 200);
 
-    this.shieldBooster.setPosition(x, y)
+    this.shieldBooster.setPosition(x, y);
     this.lastShieldBoosterSpawn += 10000;
   }
 
@@ -637,14 +659,14 @@ update (time:number, delta:number)
   if (this.shieldEnergy < 1)
   {
     this.shieldActive = false;
-    this.shield.setVisible(false);
+    this.shield.setActive(false).setVisible(false);
   }
   
   // Восстановление щита после отключения.
   if (!this.shieldActive && this.shieldEnergy >= 1) 
   {
     this.shieldActive = true;
-    this.shield.setVisible(true);
+    this.shield.setActive(true).setVisible(true);
   }
 
   // Если противники некоторое время не спавнились.
