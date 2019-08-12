@@ -1,10 +1,10 @@
 export class Asteroid extends Phaser.Physics.Arcade.Sprite 
 {
-  speed:number;
-  size:number;
+  speed: number;
+  size: number;
 
   // Конcтруктор объекта астероид.
-  constructor (scene:Phaser.Scene) 
+  constructor (scene: Phaser.Scene) 
   {
     // Настраиваем место появления (текущая сцена, координаты х и у), текстуру.
     super (scene, 0, 0, "asteroid");
@@ -13,11 +13,11 @@ export class Asteroid extends Phaser.Physics.Arcade.Sprite
     this.speed = Phaser.Math.GetSpeed (50, 1);
   }
 
-  xdif:number;
-  ydif:number;
+  xdif: number;
+  ydif: number;
 
   // Метод для запуска астероида, настройка стартовых параметров.
-  launch (x:number, y:number, size:number, xd:number, yd:number) : Asteroid 
+  launch (x: number, y: number, size: number, xd: number, yd: number): Asteroid 
   {
     this.size = size;
     this.setSprite ();
@@ -34,12 +34,12 @@ export class Asteroid extends Phaser.Physics.Arcade.Sprite
   }
 
   // Метод для обновления состояния астероида (перемещение, вылет за сцену).
-  update (time:number, delta:number) 
+  update (time: number, delta: number) 
   {
     // Обновляем координаты.
-    var t:number = this.ydif * this.speed*delta/100;
-    this.y += this.speed * delta +t/2;
-    this.x += this.xdif * this.speed*delta/100;
+    var t: number = this.ydif * this.speed * delta/100;
+    this.y += this.speed * delta + t/2;
+    this.x += this.xdif * this.speed * delta/100;
     
     // Если вылетел за сцену, деактивируем.
     if (this.y > Number (this.scene.game.config.height) + 50)
@@ -50,18 +50,18 @@ export class Asteroid extends Phaser.Physics.Arcade.Sprite
   }
 
   // Метод для получения координаты У.
-  get Y():number
+  get Y(): number
   {
     return this.y;
   }
   // Метод для получения координаты Х.
-  get X():number
+  get X(): number
   {
     return this.x;
   }
 
   // Метод для установки спрайта астероиду, в зависимости от его размера (большой, средний, малый).
-  setSprite():void
+  setSprite(): void
   {
     if (this.size == 1)
     {

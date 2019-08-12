@@ -1,9 +1,9 @@
 export class Background extends Phaser.Physics.Arcade.Sprite 
 {
-  speed:number;
+  speed: number;
 
   // Конструктор объекта Фон.
-  constructor (scene:Phaser.Scene) 
+  constructor (scene: Phaser.Scene) 
   {
     // Настраиваем место появления (текущая сцена, координаты х и у), текстуру.
     super (scene, 0, 0, "background");
@@ -13,7 +13,7 @@ export class Background extends Phaser.Physics.Arcade.Sprite
   }
 
   // Метод для запуска фона, настройка стартовых параметров.
-  launch (x:number, y:number) : Background 
+  launch (x: number, y: number): Background 
   {
     Phaser.Physics.Arcade.Sprite.call (this, this.scene, 0, 0, 'background');
     this.setScale (this.speed * 10, this.speed * 10);
@@ -29,7 +29,7 @@ export class Background extends Phaser.Physics.Arcade.Sprite
   }
 
   // Метод для обновления состояния фона (перемещение, вылет за сцену).
-  update (time:number, delta:number) 
+  update (time: number, delta: number) 
   {
     // Обновляем координаты.
     this.y += this.speed * delta;

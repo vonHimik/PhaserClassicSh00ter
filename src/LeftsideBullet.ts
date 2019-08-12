@@ -2,22 +2,22 @@
 export enum LeftsideBulletType 
 {
    Default,
-   Wobbly, // Вихляющие
+   Wobbly,
    Mega,
    Fast,
 }
 
 export class LeftsideBullet extends Phaser.Physics.Arcade.Sprite 
 {
-  speed : number;
-  leftsideBulletType : LeftsideBulletType;
-  totalTime : number = 0;
+  speed: number;
+  leftsideBulletType: LeftsideBulletType;
+  totalTime: number = 0;
 
   // Число снарядов за залп.
-  shotMultiply : number = 1;
+  shotMultiply: number = 1;
 
   // Конструктор объекта Снаряд.
-  constructor (scene : Phaser.Scene)
+  constructor (scene: Phaser.Scene)
   {
     // Настраиваем место появления (текущая сцена, координаты х и у), текстуру.
     super (scene, 0, 0, "bullet");
@@ -27,7 +27,7 @@ export class LeftsideBullet extends Phaser.Physics.Arcade.Sprite
   }
 
   // Метод для выстрела, устанаваливаем характеристики снаряда.
-  fire (x:number, y:number, leftsideBulletType : LeftsideBulletType) 
+  fire (x : number, y : number, leftsideBulletType : LeftsideBulletType) 
   {
     this.totalTime = Phaser.Math.FloatBetween (0,7);
     this.shotMultiply = Phaser.Math.FloatBetween (0.5,1);
@@ -62,7 +62,7 @@ export class LeftsideBullet extends Phaser.Physics.Arcade.Sprite
   }
 
   // Вызываем на сцену снаряд базового типа, по координатам, добавляем физику.
-  leftsideDefaultBullet (x : number, y : number)
+  leftsideDefaultBullet (x: number, y: number)
   {
     Phaser.Physics.Arcade.Sprite.call (this, this.scene, 0, 0, 'broadsideBullet');
     this.scene.physics.add.existing (this);
@@ -70,7 +70,7 @@ export class LeftsideBullet extends Phaser.Physics.Arcade.Sprite
   }
 
   // Вызываем на сцену снаряд быстрого типа, по координатам, модифицируем скорость, добавляем физику.
-  leftsideFastBullet (x : number, y : number)
+  leftsideFastBullet (x: number, y: number)
   {
     this.speed *= 5;
     Phaser.Physics.Arcade.Sprite.call (this, this.scene, 0, 0, 'fastBullet');
@@ -79,7 +79,7 @@ export class LeftsideBullet extends Phaser.Physics.Arcade.Sprite
   }
   
   // Вызываем на сцену снаряд вихляющего типа, по координатам, модифицируем скорость, добавляем физику.
-  leftsideWobblyBullet (x : number, y : number) 
+  leftsideWobblyBullet (x: number, y: number) 
   {
     this.speed *= 3;
     Phaser.Physics.Arcade.Sprite.call (this, this.scene, 0, 0, 'wobblyBullet');
@@ -88,7 +88,7 @@ export class LeftsideBullet extends Phaser.Physics.Arcade.Sprite
   }
 
   // Метод для обновления снаряда - перермещение.
-  update (time : number, delta : number)
+  update (time: number, delta: number)
   {
     // По x.
     this.x -= this.speed * delta;

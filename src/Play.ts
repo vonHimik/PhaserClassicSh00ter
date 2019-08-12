@@ -12,78 +12,78 @@ import { EnemyHolder } from "./EnemyHolder";
 export class Play extends Phaser.Scene 
 {
   // Переменная представляющая игрока.
-  player : Phaser.Physics.Arcade.Sprite;
+  player: Phaser.Physics.Arcade.Sprite;
 
   // Переменная для подбираемого обЪекта.
-  pickup : Phaser.Physics.Arcade.Sprite;
+  pickup: Phaser.Physics.Arcade.Sprite;
 
   // Переменная для дополнительной жизни.
-  heal : Phaser.Physics.Arcade.Sprite;
+  heal: Phaser.Physics.Arcade.Sprite;
 
   // Переменная для восстановителя энергии щита.
-  shieldBooster : Phaser.Physics.Arcade.Sprite;
+  shieldBooster: Phaser.Physics.Arcade.Sprite;
 
   // Переменнаая для эффекта взрыва.
   explosionEffect : Phaser.Physics.Arcade.Sprite;
 
   // Переменная для масштабирования того, на сколько кусков распадётся корабль игрока.
-  pc : number = 8;
+  pc: number = 8;
 
   // Куски игрока.
-  playerPieces : Phaser.Physics.Arcade.Sprite[];
+  playerPieces: Phaser.Physics.Arcade.Sprite[];
 
   // Создаём группы с физикой для отдельных типов объектов.
-  asteroids : Phaser.Physics.Arcade.Group;
-  lasers : Phaser.Physics.Arcade.Group;
-  leftsideLasers : Phaser.Physics.Arcade.Group;
-  rightsideLasers : Phaser.Physics.Arcade.Group;
-  backsideLasers : Phaser.Physics.Arcade.Group;
-  enemies : Phaser.Physics.Arcade.Group;
-  background : Phaser.Physics.Arcade.Group;
+  asteroids: Phaser.Physics.Arcade.Group;
+  lasers: Phaser.Physics.Arcade.Group;
+  leftsideLasers: Phaser.Physics.Arcade.Group;
+  rightsideLasers: Phaser.Physics.Arcade.Group;
+  backsideLasers: Phaser.Physics.Arcade.Group;
+  enemies: Phaser.Physics.Arcade.Group;
+  background: Phaser.Physics.Arcade.Group;
 
   // Переменная для команд управления.
-  moveKeys : {[key:string]:Phaser.Input.Keyboard.Key};
+  moveKeys: {[key:string]:Phaser.Input.Keyboard.Key};
 
   // List of predefined enemies.
-  enemyHolders : EnemyHolder[];
+  enemyHolders: EnemyHolder[];
 
   // Переменные для отсчитывания времени с момента последнего спавна (врага, снаряжения).
-  lastSpawn : number = 0;
-  lastPickupSpawn : number = 0;
-  lastHealSpawn : number = 0;
-  lastShieldBoosterSpawn : number = 0;
+  lastSpawn: number = 0;
+  lastPickupSpawn: number = 0;
+  lastHealSpawn: number = 0;
+  lastShieldBoosterSpawn: number = 0;
 
   // Значения элементов интерфейса - очки.
-  score : number = 0;
-  scoreText : Phaser.GameObjects.Text;
+  score: number = 0;
+  scoreText: Phaser.GameObjects.Text;
 
  // Значения элементов интерфейса - здоровье.
-  health : number = 3;
-  healthSprites : {[key:number]:Phaser.Physics.Arcade.Sprite};
-  healthText : Phaser.GameObjects.Text;
+  health: number = 3;
+  healthSprites: {[key: number]: Phaser.Physics.Arcade.Sprite};
+  healthText: Phaser.GameObjects.Text;
 
   // Значения элементов интерфейса - щит.
-  shieldActive : boolean = true;
-  shield : Phaser.Physics.Arcade.Sprite;
-  shieldText : Phaser.GameObjects.Text;
-  shieldEnergy : number = 100;
+  shieldActive: boolean = true;
+  shield: Phaser.Physics.Arcade.Sprite;
+  shieldText: Phaser.GameObjects.Text;
+  shieldEnergy: number = 100;
 
   // Переменная в которую будем считать число пропущенных врагов.
-  missedEnemies : number = 0;
-  missedEnemiesText : Phaser.GameObjects.Text;
+  missedEnemies: number = 0;
+  missedEnemiesText: Phaser.GameObjects.Text;
 
   // Вооружение.
-  gunType : number = 0; 
-  lastSideShooted : number = 0;
-  upgrades : Phaser.Physics.Arcade.Group;
-  currentBullet : BulletType;
-  currentLeftsideBullet : LeftsideBulletType;
-  currentRightsideBullet : RightsideBulletType;
-  currentBacksideBullet : BacksideBulletType;
-  shootCooldown : number = 300;
-  upgradeCooldown : number = 0;
+  gunType: number = 0; 
+  lastSideShooted: number = 0;
+  upgrades: Phaser.Physics.Arcade.Group;
+  currentBullet: BulletType;
+  currentLeftsideBullet: LeftsideBulletType;
+  currentRightsideBullet: RightsideBulletType;
+  currentBacksideBullet: BacksideBulletType;
+  shootCooldown: number = 300;
+  upgradeCooldown: number = 0;
 
-  playerEnemyCollier : Phaser.Physics.Arcade.Collider;
+  playerEnemyCollier: Phaser.Physics.Arcade.Collider;
 
   constructor() 
   {
@@ -97,9 +97,9 @@ export class Play extends Phaser.Scene
 
     this.background = this.physics.add.group
     ({
-      classType:Background,
-      maxSize:300,
-      runChildUpdate:true
+      classType: Background,
+      maxSize: 300,
+      runChildUpdate: true
     });
 
     // Добавляем и настраиваем корабль игрока.
@@ -145,17 +145,17 @@ export class Play extends Phaser.Scene
     this.lastPickupSpawn = 0;
     
     // Определяем размер кусочков, на которые будет разделяться корабль игрока, на основе его размера и коэффициента масштабирования.
-    let pw : number = this.player.width / this.pc;
-    let ph : number = this.player.height / this.pc;
+    let pw: number = this.player.width / this.pc;
+    let ph: number = this.player.height / this.pc;
     this.playerPieces = [];
     
     // В цикле проходимся по кораблю игрока, разделяя его на части.
-    for (let i : number = 0; i < this.pc; ++i) 
+    for (let i: number = 0; i < this.pc; ++i) 
     {
-      for (let j : number = 0; j < this.pc; ++j) 
+      for (let j: number = 0; j < this.pc; ++j) 
       {
         // Выполняем обрезку корабля игрока, отделив от него в отдельный спрайт кусочек указанного размера.
-        let pp:Phaser.Physics.Arcade.Sprite = this.physics.add.sprite(320, 500, "playership1").setScale(0.5, 0.5).setCrop(i*pw, j*ph, pw, ph);
+        let pp: Phaser.Physics.Arcade.Sprite = this.physics.add.sprite(320, 500, "playership1").setScale(0.5, 0.5).setCrop(i*pw, j*ph, pw, ph);
 
         // Этот кусочек невидим.
         pp.setActive(false).setVisible(false);
@@ -396,7 +396,7 @@ InitializeEnemiesList()
 }
 
 // Метод обновляющий состояния игры (спавны, состояния, выбор оружия и т.д.).
-update (time:number, delta:number) 
+update (time: number, delta: number) 
 {
   // Отсчитываем время с последнего спавна.
   this.lastSpawn -= delta;
@@ -678,10 +678,10 @@ update (time:number, delta:number)
     (this.enemies.get() as Enemy).launch(Phaser.Math.Between(50, 400), -50); 
 
     // Создаём объект типа "враг" и добавляем его в соответствующую группу.
-    var enemy : Enemy = this.enemies.get() as Enemy;
+    var enemy: Enemy = this.enemies.get() as Enemy;
 
     // Генерируем случайный индекс.
-    var randomIndex : integer = Phaser.Math.Between(0, this.enemyHolders.length-1);
+    var randomIndex: integer = Phaser.Math.Between(0, this.enemyHolders.length-1);
 
     // Инициализируем новый объект у управляющей структуры.    
     enemy.init(this.enemyHolders[randomIndex]);
@@ -722,7 +722,7 @@ constrainVelocity(sprite : Phaser.Physics.Arcade.Sprite, maxVelocity : number)
 }
 
 // Метод вызывающий по указанным координатам спрайт звёздочки для имитации взрыва.
-addExplosionEffect ( x : number, y : number )
+addExplosionEffect ( x: number, y: number )
 {
     this.explosionEffect = this.physics.add.sprite(x, y, "effect").setScale(0.5, 0.5);
     this.explosionEffect.body.width *= 0.5;
@@ -730,7 +730,7 @@ addExplosionEffect ( x : number, y : number )
 }
 
 // Метод удаляющий спрайт звёздочки.
-deleteExplosionEffect ( effect : Phaser.Physics.Arcade.Sprite )
+deleteExplosionEffect (effect: Phaser.Physics.Arcade.Sprite)
 {
   if (!effect.active) return;
   effect.setActive(false).setVisible(false);
@@ -785,7 +785,7 @@ collideHeal(player: Phaser.Physics.Arcade.Sprite, heal: Phaser.Physics.Arcade.Sp
 }
 
 // Метод для добавления и настройки коллайдера восстановителя щита.
-collideShieldBooster(player : Phaser.Physics.Arcade.Sprite, shieldBooster : Phaser.Physics.Arcade.Sprite)
+collideShieldBooster(player: Phaser.Physics.Arcade.Sprite, shieldBooster : Phaser.Physics.Arcade.Sprite)
 {
   // Если на сцене сейчас нету игрока или подбираемого объекта, то выходим.
   if (!player.active) return;
@@ -868,7 +868,7 @@ deactivateEnemy(enemy : Enemy)
 }
 
 // Метод обрабатывающий поражение врага снарядом.
-collideLaserEnemy (laser : Bullet, enemy : Enemy) 
+collideLaserEnemy (laser: Bullet, enemy: Enemy) 
 {
   // Если на сцене сейчас нету снаряда или врага, то выходим.
   if (!laser.active) return;
@@ -892,7 +892,7 @@ collideLaserEnemy (laser : Bullet, enemy : Enemy)
 }
 
 // Метод обрабатывающий поражение врага боковым левым снарядом.
-collideLeftsideLaserEnemy (leftsideLaser : LeftsideBullet, enemy : Enemy) 
+collideLeftsideLaserEnemy (leftsideLaser: LeftsideBullet, enemy: Enemy) 
 {
   // Если на сцене сейчас нету снаряда или врага, то выходим.
   if (!leftsideLaser.active) return;
@@ -916,7 +916,7 @@ collideLeftsideLaserEnemy (leftsideLaser : LeftsideBullet, enemy : Enemy)
 }
 
 // Метод обрабатывающий поражение врага боковым правым снарядом.
-collideRightsideLaserEnemy (rightsideLaser : RightsideBullet, enemy : Enemy) 
+collideRightsideLaserEnemy (rightsideLaser: RightsideBullet, enemy: Enemy) 
 {
   // Если на сцене сейчас нету снаряда или врага, то выходим.
   if (!rightsideLaser.active) return;
@@ -940,7 +940,7 @@ collideRightsideLaserEnemy (rightsideLaser : RightsideBullet, enemy : Enemy)
 }
 
 // Метод обрабатывающий поражение врага кормовым снарядом.
-collideBacksideLaserEnemy (backsideLaser : BacksideBullet, enemy : Enemy) 
+collideBacksideLaserEnemy (backsideLaser: BacksideBullet, enemy: Enemy) 
 {
   // Если на сцене сейчас нету снаряда или врага, то выходим.
   if (!backsideLaser.active) return;
@@ -1013,7 +1013,7 @@ playerExplode()
     for (let j: number = 0; j < this.pc; ++j) 
     {
       // Каждый будем считать отдельным объектом соответствующего класса со своим индексом.
-      let pp : Phaser.Physics.Arcade.Sprite = this.playerPieces[index];  
+      let pp: Phaser.Physics.Arcade.Sprite = this.playerPieces[index];  
       
       // Активируем объект.       
       pp.setActive(true).setVisible(true);
@@ -1120,8 +1120,8 @@ collideLaserAsteroid(laser : Bullet, asteroid : Asteroid)
     asteroid.size+=1;
 
     // Создаём ещё один подобный астероид.      
-    var t:number = Phaser.Math.Between(-50,50);
-    var t2:number = Phaser.Math.Between(-50,50);
+    var t: number = Phaser.Math.Between(-50,50);
+    var t2: number = Phaser.Math.Between(-50,50);
     asteroid.setSprite();
     (this.asteroids.get() as Asteroid).launch(asteroid.X,asteroid.Y,asteroid.size,t,Phaser.Math.Between(-50,50));
          
@@ -1157,8 +1157,8 @@ collideLeftsideLaserAsteroid(leftsideLaser : LeftsideBullet, asteroid : Asteroid
     asteroid.size+=1;
 
     // Создаём ещё один подобный астероид.      
-    var t:number = Phaser.Math.Between(-50,50);
-    var t2:number = Phaser.Math.Between(-50,50);
+    var t: number = Phaser.Math.Between(-50,50);
+    var t2: number = Phaser.Math.Between(-50,50);
     asteroid.setSprite();
     (this.asteroids.get() as Asteroid).launch(asteroid.X,asteroid.Y,asteroid.size,t,Phaser.Math.Between(-50,50));
          
@@ -1194,8 +1194,8 @@ collideRightsideLaserAsteroid(rightsideLaser : RightsideBullet, asteroid : Aster
     asteroid.size+=1;
 
     // Создаём ещё один подобный астероид.      
-    var t:number = Phaser.Math.Between(-50,50);
-    var t2:number = Phaser.Math.Between(-50,50);
+    var t: number = Phaser.Math.Between(-50,50);
+    var t2: number = Phaser.Math.Between(-50,50);
     asteroid.setSprite();
     (this.asteroids.get() as Asteroid).launch(asteroid.X,asteroid.Y,asteroid.size,t,Phaser.Math.Between(-50,50));
          
@@ -1231,7 +1231,7 @@ collideBacksideLaserAsteroid(backsideLaser : BacksideBullet, asteroid : Asteroid
     asteroid.size+=1;
 
     // Создаём ещё один подобный астероид.      
-    var t : number = Phaser.Math.Between(-50,50);
+    var t: number = Phaser.Math.Between(-50,50);
     var t2 : number = Phaser.Math.Between(-50,50);
     asteroid.setSprite();
     (this.asteroids.get() as Asteroid).launch(asteroid.X,asteroid.Y,asteroid.size,t,Phaser.Math.Between(-50,50));

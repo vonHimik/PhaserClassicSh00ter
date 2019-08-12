@@ -2,19 +2,19 @@ import { EnemyHolder } from "./EnemyHolder";
    
 export class Enemy extends Phaser.Physics.Arcade.Sprite 
 {
-  speed:number;
+  speed: number;
 
   // {Honza}
   // Enemy variables to customise them and their beavior
 
   // Имя спрайта.
-  spriteName:string = null;
+  spriteName: string = null;
 
   // Функция обновления.
-  updateFunction:(x:number, y:number)=>void = null;
+  updateFunction: (x: number, y: number) => void = null;
 
   // Конструктор объекта Враг.                         
-  constructor (scene:Phaser.Scene) 
+  constructor (scene: Phaser.Scene) 
   {
     // Настраиваем место появления (текущая сцена, координаты х и у), текстуру.
     super (scene, 0, 0, "enemy");
@@ -24,7 +24,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite
   }
 
   // Метод для запуска врага.
-  launch (x:number, y:number) : Enemy 
+  launch (x: number, y: number): Enemy 
   {
     // Устанавливаем спрайт.
     if (this.spriteName != null)
@@ -49,7 +49,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite
   }
 
 // Метод для обновления состояния врага - перемещение, выход за экран.
-  update (time:number, delta:number) 
+  update (time: number, delta: number) 
   {
     if (this.updateFunction == null)
     {
