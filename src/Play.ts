@@ -667,6 +667,9 @@ update (time:number, delta:number)
     // Размещаем на сцене.
     enemy.launch(Phaser.Math.Between(50, 400), -50);
 
+    // Увеличиваем сложность: чем больше у игрока очков, тем быстрее противники.
+    enemy.speed = Phaser.Math.GetSpeed (50 + (this.score / 5), 1);
+
     // Сбрасываем таймер спавна.
     this.lastSpawn += 1000;
   }
@@ -1211,7 +1214,7 @@ collideBacksideLaserAsteroid(backsideLaser : BacksideBullet, asteroid : Asteroid
  shieldHit() 
  {
    // Если у щита есть энергия.
-   if (this.shieldEnergy > 10)
+   if (this.shieldEnergy >= 10)
    {
       // Наносим урон энергии щита.
       this.shieldEnergy -= 10;
