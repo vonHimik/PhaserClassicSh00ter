@@ -120,7 +120,7 @@ export class BacksideBullet extends Phaser.Physics.Arcade.Sprite
     }
 
     // Деактивируем, если улетел за сцену.
-    if (this.y >= 00)
+    if (this.y >= 600)
     {
       this.setActive  (false);
       this.setVisible (false);

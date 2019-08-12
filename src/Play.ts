@@ -233,21 +233,21 @@ export class Play extends Phaser.Scene
     this.leftsideLasers = this.physics.add.group
     ({
       classType: LeftsideBullet,
-      maxSize: 20,
+      maxSize: 10,
       runChildUpdate: true
     }); 
 
     this.rightsideLasers = this.physics.add.group
     ({
       classType: RightsideBullet,
-      maxSize: 20,
+      maxSize: 10,
       runChildUpdate: true
     }); 
 
     this.backsideLasers = this.physics.add.group
     ({
       classType: BacksideBullet,
-      maxSize: 20,
+      maxSize: 10,
       runChildUpdate: true
     });                
       
@@ -1040,6 +1040,15 @@ playerExplode()
 // Метод обрабатывающий конец игры.
 gameOver() 
 {
+  this.score = 0;
+  this.scoreText.text = "Score: " + this.score;
+
+  this.shieldEnergy = 100;
+  this.shieldText.text = "Shield energy: " + this.shieldEnergy + "%";
+
+  this.missedEnemies = 0;
+  this.missedEnemiesText.text = "Missed enemies: " + this.missedEnemies;
+
   // Перезагружаем текущую сцену.
   this.scene.restart();
 }
@@ -1222,8 +1231,8 @@ collideBacksideLaserAsteroid(backsideLaser : BacksideBullet, asteroid : Asteroid
     asteroid.size+=1;
 
     // Создаём ещё один подобный астероид.      
-    var t:number = Phaser.Math.Between(-50,50);
-    var t2:number = Phaser.Math.Between(-50,50);
+    var t : number = Phaser.Math.Between(-50,50);
+    var t2 : number = Phaser.Math.Between(-50,50);
     asteroid.setSprite();
     (this.asteroids.get() as Asteroid).launch(asteroid.X,asteroid.Y,asteroid.size,t,Phaser.Math.Between(-50,50));
          
