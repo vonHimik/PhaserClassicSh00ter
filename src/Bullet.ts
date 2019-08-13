@@ -1,4 +1,4 @@
-// Список типов боеприпасов.
+// List of types of ammunition.
 export enum BulletType 
 {
    Default,
@@ -13,20 +13,19 @@ export class Bullet extends Phaser.Physics.Arcade.Sprite
   bulletType: BulletType;
   totalTime: number = 0;
 
-  // Число снарядов за залп.
+  // The number of shells per salvo.
   shotMultiply: number = 1;
 
-  // Конструктор объекта Снаряд.
   constructor (scene: Phaser.Scene)
   {
-    // Настраиваем место появления (текущая сцена, координаты х и у), текстуру.
+    // Set the scene (current scene, x and y coordinates), texture.
     super (scene, 0, 0, "bullet");
     
-    // Настраиваем скорость (пикселей за фрейм).
+    // Set the speed (pixels per frame).
     this.speed = Phaser.Math.GetSpeed (300, 1);
   }
 
-  // Метод для выстрела, устанаваливаем характеристики снаряда.
+  // Method for the shot, set the characteristics of the projectile.
   fire (x: number, y: number, bulletType:BulletType) 
   {
     this.totalTime = Phaser.Math.FloatBetween (0,7);
@@ -36,7 +35,7 @@ export class Bullet extends Phaser.Physics.Arcade.Sprite
     this.scaleY = 1;
     this.bulletType = bulletType;     
     
-    // Переключаем тип снаряда.
+    // Switch the type of projectile.
     switch (bulletType)
     {
       case BulletType.Default:
@@ -61,7 +60,7 @@ export class Bullet extends Phaser.Physics.Arcade.Sprite
     this.setVisible (true);
   }
 
-  // Вызываем на сцену снаряд базового типа, по координатам, добавляем физику.
+  // We call on the stage a projectile of a basic type, in coordinates, add physics.
   defaultBullet (x: number, y: number)
   {
     Phaser.Physics.Arcade.Sprite.call (this, this.scene, 0, 0, 'bullet');
@@ -69,7 +68,7 @@ export class Bullet extends Phaser.Physics.Arcade.Sprite
     this.setPosition (x, y - 45);
   }
 
-  // Вызываем на сцену снаряд быстрого типа, по координатам, модифицируем скорость, добавляем физику.
+  // We call a fast-type projectile onto the scene, coordinate, modify the speed, add physics.
   fastBullet (x: number, y: number)
   {
     this.speed *= 5;
@@ -78,7 +77,7 @@ export class Bullet extends Phaser.Physics.Arcade.Sprite
     this.setPosition (x, y - 45);
   }
   
-  // Вызываем на сцену снаряд вихляющего типа, по координатам, модифицируем скорость, добавляем физику.
+  // We invoke a wobbling-type projectile onto the stage, coordinate, modify the speed, add physics.
   wobblyBullet (x: number, y: number)
   {
     this.speed *= 3;
@@ -87,29 +86,29 @@ export class Bullet extends Phaser.Physics.Arcade.Sprite
     this.setPosition (x, y - 45);
   }
 
-  // Метод для обновления снаряда - перермещение.
+  // The method for updating the projectile is moving.
   update (time: number, delta: number)
   {
-    // По у.
+    // By y.
     this.y -= this.speed * delta;
     this.totalTime += delta;
     
-    // Если тип снаряда - вихляющий.
+    // If the type of projectile is wobbling.
     if (this.bulletType == BulletType.Wobbly)
     {
-      // По х.
+      // By х.
       this.x += this.shotMultiply * 20 * Math.sin (this.totalTime/30);
     }
     
-    // Если тип снаряда - мега.
+    // If the type of shell is mega.
     if (this.bulletType == BulletType.Mega)
     {
-      // Меняем размеры.
+      // We change the sizes.
       this.scaleX = 2 * Math.sin (this.totalTime/100);
       this.scaleY = 2 * Math.sin (this.totalTime/100);
     }
 
-    // Деактивируем, если улетел за сцену.
+    // Deactivate if flew off stage.
     if (this.y <= 0)
     {
       this.setActive  (false);

@@ -1,4 +1,4 @@
-// Список типов боеприпасов.
+// List of types of ammunition.
 export enum LeftsideBulletType 
 {
    Default,
@@ -13,21 +13,20 @@ export class LeftsideBullet extends Phaser.Physics.Arcade.Sprite
   leftsideBulletType: LeftsideBulletType;
   totalTime: number = 0;
 
-  // Число снарядов за залп.
+  // The number of shells per salvo.
   shotMultiply: number = 1;
 
-  // Конструктор объекта Снаряд.
   constructor (scene: Phaser.Scene)
   {
-    // Настраиваем место появления (текущая сцена, координаты х и у), текстуру.
+    // Set the scene (current scene, x and y coordinates), texture.
     super (scene, 0, 0, "bullet");
     
-    // Настраиваем скорость (пикселей за фрейм).
+    // Set the speed (pixels per frame).
     this.speed = Phaser.Math.GetSpeed (300, 1);
   }
 
-  // Метод для выстрела, устанаваливаем характеристики снаряда.
-  fire (x : number, y : number, leftsideBulletType : LeftsideBulletType) 
+  // Method for the shot, set the characteristics of the projectile.
+  fire (x: number, y: number, leftsideBulletType: LeftsideBulletType) 
   {
     this.totalTime = Phaser.Math.FloatBetween (0,7);
     this.shotMultiply = Phaser.Math.FloatBetween (0.5,1);
@@ -36,7 +35,7 @@ export class LeftsideBullet extends Phaser.Physics.Arcade.Sprite
     this.scaleY = 1;
     this.leftsideBulletType = leftsideBulletType;     
     
-    // Переключаем тип снаряда.
+    // Switch the type of projectile.
     switch (leftsideBulletType)
     {
       case LeftsideBulletType.Default:
@@ -61,7 +60,7 @@ export class LeftsideBullet extends Phaser.Physics.Arcade.Sprite
     this.setVisible (true);
   }
 
-  // Вызываем на сцену снаряд базового типа, по координатам, добавляем физику.
+  // We call on the stage a projectile of a basic type, in coordinates, add physics.
   leftsideDefaultBullet (x: number, y: number)
   {
     Phaser.Physics.Arcade.Sprite.call (this, this.scene, 0, 0, 'broadsideBullet');
@@ -69,7 +68,7 @@ export class LeftsideBullet extends Phaser.Physics.Arcade.Sprite
     this.setPosition (x - 45, y);
   }
 
-  // Вызываем на сцену снаряд быстрого типа, по координатам, модифицируем скорость, добавляем физику.
+  // We call a fast-type projectile onto the scene, coordinate, modify the speed, add physics.
   leftsideFastBullet (x: number, y: number)
   {
     this.speed *= 5;
@@ -78,7 +77,7 @@ export class LeftsideBullet extends Phaser.Physics.Arcade.Sprite
     this.setPosition (x - 45, y);
   }
   
-  // Вызываем на сцену снаряд вихляющего типа, по координатам, модифицируем скорость, добавляем физику.
+  // We invoke a wobbling-type projectile onto the stage, coordinate, modify the speed, add physics.
   leftsideWobblyBullet (x: number, y: number) 
   {
     this.speed *= 3;
@@ -87,39 +86,39 @@ export class LeftsideBullet extends Phaser.Physics.Arcade.Sprite
     this.setPosition (x - 45, y);
   }
 
-  // Метод для обновления снаряда - перермещение.
+  // The method for updating the projectile is moving.
   update (time: number, delta: number)
   {
-    // По x.
+    // By x.
     this.x -= this.speed * delta;
     this.totalTime += delta;
 
-    // Если тип снаряда - обычный.
+    // If the type of shell is normal.
     if (this.leftsideBulletType == LeftsideBulletType.Default)
     {
-      // Поворачиваем.
+      // We turn.
       this.rotation = -1.55; 
     }
     
-    // Если тип снаряда - вихляющий.
+    // If the type of projectile is wobbling.
     if (this.leftsideBulletType == LeftsideBulletType.Wobbly)
     {
-      // Поворачиваем.
+      // We turn.
       this.rotation = -1.55; 
 
-      // По y.
+      // By y.
       this.y += this.shotMultiply * 20 * Math.sin (this.totalTime/30);
     }
     
-    // Если тип снаряда - мега.
+    // If the type of shell is mega.
     if (this.leftsideBulletType == LeftsideBulletType.Mega)
     {
-      // Меняем размеры.
+      // We change the sizes.
       this.scaleX = 2 * Math.sin (this.totalTime/100);
       this.scaleY = 2 * Math.sin (this.totalTime/100);
     }
 
-    // Деактивируем, если улетел за сцену.
+    // Deactivate if flew off stage.
     if (this.x <= 0)
     {
       this.setActive  (false);

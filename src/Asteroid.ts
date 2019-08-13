@@ -3,24 +3,23 @@ export class Asteroid extends Phaser.Physics.Arcade.Sprite
   speed: number;
   size: number;
 
-  // Конcтруктор объекта астероид.
   constructor (scene: Phaser.Scene) 
   {
-    // Настраиваем место появления (текущая сцена, координаты х и у), текстуру.
+    // Set the scene (current scene, x and y coordinates), texture.
     super (scene, 0, 0, "asteroid");
 
-    // Настраиваем скорость (пикселей за фрейм).
+    // Set the speed (pixels per frame).
     this.speed = Phaser.Math.GetSpeed (50, 1);
   }
 
   xdif: number;
   ydif: number;
 
-  // Метод для запуска астероида, настройка стартовых параметров.
+  // Method for launching an asteroid, setting start parameters.
   launch (x: number, y: number, size: number, xd: number, yd: number): Asteroid 
   {
     this.size = size;
-    this.setSprite ();
+    this.setSprite();
     this.xdif = xd;
     this.ydif = yd;
     this.setScale (0.3, 0.3);
@@ -33,15 +32,15 @@ export class Asteroid extends Phaser.Physics.Arcade.Sprite
     return this;
   }
 
-  // Метод для обновления состояния астероида (перемещение, вылет за сцену).
+  // Method for updating the state of the asteroid (moving, take-off behind the scenes).
   update (time: number, delta: number) 
   {
-    // Обновляем координаты.
+    // Updating the coordinates.
     var t: number = this.ydif * this.speed * delta/100;
     this.y += this.speed * delta + t/2;
     this.x += this.xdif * this.speed * delta/100;
     
-    // Если вылетел за сцену, деактивируем.
+    // If flew offstage, deactivate.
     if (this.y > Number (this.scene.game.config.height) + 50)
     {
       this.setActive  (false);
@@ -49,18 +48,18 @@ export class Asteroid extends Phaser.Physics.Arcade.Sprite
     }
   }
 
-  // Метод для получения координаты У.
+  // Method for obtaining the Y coordinates.
   get Y(): number
   {
     return this.y;
   }
-  // Метод для получения координаты Х.
+  // Method for obtaining the X coordinate.
   get X(): number
   {
     return this.x;
   }
 
-  // Метод для установки спрайта астероиду, в зависимости от его размера (большой, средний, малый).
+  // A method for setting a sprite to an asteroid, depending on its size (large, medium, small).
   setSprite(): void
   {
     if (this.size == 1)

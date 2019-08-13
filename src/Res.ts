@@ -1,20 +1,19 @@
 export class Res extends Phaser.Scene 
 {
-  // Конструктор объекта Ресурсы.
   constructor()
   {
     super ("Res");
   }
 
-  // Метод для предзагрузки ресурсов (изображений).
+  // Method for preloading resources (images).
   preload() 
   {
     console.log("Res.preload()");
 
-    // Устанавливаем базовую ссылку для загрузки.
+    // Set the base download link.
     this.load.setBaseURL("https://cdn.jsdelivr.net/gh/kefik/kenney/Shooter/");
     
-    // Загружаем указанные изображения (по адресу), присваивая им названия.
+    // We load the specified images (at the address), naming them.
     this.load.image("playership1", "playerShip1_blue.png");
     this.load.image("bullet", "lasers/laserBlue01.png");
     this.load.image("broadsideBullet", "lasers/laserBlue07.png");
@@ -37,7 +36,7 @@ export class Res extends Phaser.Scene
     this.load.image("effect", "effects/star2.png");
   }
 
-  // Метод закрывающий текущую сцену и переходящий к главной сцене.
+  // The method closes the current scene and moves to the main scene.
   create() 
   {
     console.log("Res.create()");

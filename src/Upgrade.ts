@@ -1,13 +1,12 @@
 export class Upgrade extends Phaser.Physics.Arcade.Sprite 
 {
-  // Конструктор объекта Апгрейд.
   constructor (scene: Phaser.Scene)
   {
-    // Размещаем его на сцене.
+    // We place it on the stage.
     super (scene, 0, 0, "upgrade");
   }
   
-  // Метод для спавна объекта Апгрейд (спрайт, физика, место появления).
+  // Method for the spawn of the Upgrade object (sprite, physics, place of occurrence).
   spawn() 
   {
     Phaser.Physics.Arcade.Sprite.call (this, this.scene, 0, 0, 'powerup');
@@ -18,7 +17,7 @@ export class Upgrade extends Phaser.Physics.Arcade.Sprite
     this.setVisible(true);
   }
 
-  // Метод деактивирующий объект Апгрейд при его выходе за границы экрана.
+  // Method The deactivating object Upgrade when it goes beyond the boundaries of the screen.
   update (time: number, delta: number) 
   {
     if (this.x > -5 && this.x < 485 && this.y > -5 && this.y < 645) return;

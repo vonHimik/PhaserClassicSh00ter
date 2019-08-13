@@ -1,29 +1,29 @@
 import { Res } from "./Res";
 import { Play } from "./Play";
 
-// Игровые настройки.
+// Game settings.
 export var gameConfig = 
 {
   type: Phaser.AUTO,
 
-  // Разрешение.
+  // Resolution.
   width: 480,
   height: 640,
 
-  // Цвет фона.
+  // Background color.
   backgroundColor: 0x000000,
   
-  // Физика.
+  // Physics.
   physics: 
   {
     default: 'arcade',
     arcade: 
     {
-      // Значение гравитации (по оси у).
+      // The value of gravity (along the y axis).
       gravity: { y: 0 }
     }
   },
 
-  // Порядок загрузки сцен.
+  // The order of loading scenes.
   scene: [Res, Play],        
 };

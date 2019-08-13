@@ -2,17 +2,16 @@ export class Background extends Phaser.Physics.Arcade.Sprite
 {
   speed: number;
 
-  // Конструктор объекта Фон.
   constructor (scene: Phaser.Scene) 
   {
-    // Настраиваем место появления (текущая сцена, координаты х и у), текстуру.
+    // Set the scene (current scene, x and y coordinates), texture.
     super (scene, 0, 0, "background");
 
-    // Настраиваем скорость (пикселей за фрейм).
+    // Set the speed (pixels per frame).
     this.speed = Phaser.Math.GetSpeed (Math.random() * 30 + 20, 1);         
   }
 
-  // Метод для запуска фона, настройка стартовых параметров.
+  // Method for starting the background, setting start parameters.
   launch (x: number, y: number): Background 
   {
     Phaser.Physics.Arcade.Sprite.call (this, this.scene, 0, 0, 'background');
@@ -28,13 +27,13 @@ export class Background extends Phaser.Physics.Arcade.Sprite
     return this;
   }
 
-  // Метод для обновления состояния фона (перемещение, вылет за сцену).
+  // Method for updating the background state (moving, crashing behind the scenes).
   update (time: number, delta: number) 
   {
-    // Обновляем координаты.
+    // Updating the coordinates.
     this.y += this.speed * delta;
     
-    // Если вылетел за сцену, деактивируем.
+    // If flew offstage, deactivate.
     if (this.y > Number (this.scene.game.config.height) + 50)
     {
       this.setActive  (false);
